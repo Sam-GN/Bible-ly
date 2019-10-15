@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1089296193619",
+    "firebase_url": "https://bible-ly.firebaseio.com",
+    "project_id": "bible-ly",
+    "storage_bucket": "bible-ly.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089296193619:android:8f6bf771dc1590bda04ea6",
+        "android_client_info": {
+          "package_name": "edu.calbaptist.bible_ly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1089296193619-kobfotuocq1vrgrldkangmdkb4vg3373.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVkoylrjSbDvw5tbaGUBBr4OJ3gz1n5aU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089296193619-kobfotuocq1vrgrldkangmdkb4vg3373.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

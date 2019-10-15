@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_board">
+
+    <fragment
+        android:id="@+id/nav_board"
+        android:name="edu.calbaptist.bible_ly.ui.board.BoardFragment"
+        android:label="@string/menu_board"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_notes"
+        android:name="edu.calbaptist.bible_ly.ui.notes.NotesFragment"
+        android:label="@string/menu_notes"
+        tools:layout="@layout/fragment_gallery" />
+
+    <fragment
+        android:id="@+id/nav_bible"
+        android:name="edu.calbaptist.bible_ly.ui.bible.BibleFragment"
+        android:label="@string/menu_bible"
+        tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/classes"
+        android:name="edu.calbaptist.bible_ly.ui.classes.ClassesFragment"
+        android:label="@string/menu_classes"
+        tools:layout="@layout/fragment_tools" />
+
+    <fragment
+        android:id="@+id/nav_calendar"
+        android:name="edu.calbaptist.bible_ly.ui.calendar.CalendarFragment"
+        android:label="@string/menu_calendar"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/nav_send"
+        android:name="edu.calbaptist.bible_ly.ui.send.SendFragment"
+        android:label="@string/menu_send"
+        tools:layout="@layout/fragment_send" />
+
+
+</navigation>
