@@ -29,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         database = FirebaseDatabase.getInstance().reference
 
+
+
+        // the below code is for firebase testing purposes
         database.child("users").addValueEventListener(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
