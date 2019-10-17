@@ -13,15 +13,4 @@
     <string name="menu_classes">Classes</string>
     <string name="menu_calendar">Calendar</string>
     <string name="menu_send">Send</string>
-
-    <string name="value_any_class_name">Class Name</string>
-    <!-- Types of food I could think of in 5 minutes -->
-    <string-array name="class_names">
-        <item>@string/value_any_class_name</item>
-
-        <item>Class 1</item>
-        <item>Class 2</item>
-        <item>Class 3</item>
-    </string-array>
-
 </resources>
