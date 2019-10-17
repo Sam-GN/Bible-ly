@@ -29,6 +29,8 @@ class SignInActivity : AppCompatActivity() {
         configureGoogleSignIn()
 
         firebaseAuth = FirebaseAuth.getInstance()
+
+        setupUI()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -37,7 +39,12 @@ class SignInActivity : AppCompatActivity() {
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account)
+                if (account != null) {
+                    firebaseAuthWithGoogle(account)
+                }
+                else {
+                    throw ApiException(error("data is null"))
+                }
             } catch (e: ApiException) {
                 Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
             }
