@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings.Global.getString
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -16,21 +17,23 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
+private const val TAG = "SignInActivity"
+
 class SignInActivity : AppCompatActivity() {
     val RC_SIGN_IN: Int = 1
     lateinit var mGoogleSignInClient: GoogleSignInClient
     lateinit var mGoogleSignInOptions: GoogleSignInOptions
-    lateinit var google_button: SignInButton
     private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_sign_in)
 
         configureGoogleSignIn()
 
-        firebaseAuth = FirebaseAuth.getInstance()
-
         setupUI()
+
+        firebaseAuth = FirebaseAuth.getInstance()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -55,6 +58,7 @@ class SignInActivity : AppCompatActivity() {
      * Avoid signing in if the user is already signed in
      */
     override fun onStart() {
+        Log.d(TAG, "onStart")
         super.onStart()
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
@@ -72,7 +76,7 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        google_button.setOnClickListener {
+        findViewById<SignInButton>(R.id.google_button).setOnClickListener {
             signIn()
         }
     }
