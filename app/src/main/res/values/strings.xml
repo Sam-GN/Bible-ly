@@ -13,4 +13,6 @@
     <string name="menu_classes">Classes</string>
     <string name="menu_calendar">Calendar</string>
     <string name="menu_send">Send</string>
+
+    <string name="header_sign_out">Sign Out</string>
 </resources>

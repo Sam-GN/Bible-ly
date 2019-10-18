@@ -1,5 +1,8 @@
 package edu.calbaptist.bible_ly
 
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -14,6 +17,8 @@ import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
+import android.widget.Button
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import java.util.ArrayList
 
@@ -21,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var database: DatabaseReference
+    private lateinit var signOutButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +34,6 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         database = FirebaseDatabase.getInstance().reference
-
-
 
         // the below code is for firebase testing purposes
         database.child("users").addValueEventListener(object : ValueEventListener {
@@ -83,6 +87,11 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        var x =navView.getHeaderView(0)
+        signOutButton = x.findViewById(R.id.nav_sign_out)
+        signOutButton.setOnClickListener {
+            signOut()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -94,5 +103,16 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    private fun signOut() {
+        startActivity(SignInActivity.getLaunchIntent(this))
+        FirebaseAuth.getInstance().signOut();
+    }
+
+    companion object {
+        fun getLaunchIntent(from: Context) = Intent(from, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
     }
 }
