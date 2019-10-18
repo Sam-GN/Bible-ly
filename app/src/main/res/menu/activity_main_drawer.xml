@@ -35,13 +35,4 @@
         </menu>
     </item>
 
-    <item android:title="Settings">
-        <menu>
-            <item
-                android:id="@+id/nav_sign_out"
-                android:icon="@drawable/ic_menu_account"
-                android:title="Sign Out" />
-        </menu>
-    </item>
-
 </menu>

@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var database: DatabaseReference
-    private lateinit var sign_out_button: Button // todo: is this a button?
+    private lateinit var signOutButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +34,6 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         database = FirebaseDatabase.getInstance().reference
-
-
 
         // the below code is for firebase testing purposes
         database.child("users").addValueEventListener(object : ValueEventListener {
@@ -89,6 +87,11 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        var x =navView.getHeaderView(0)
+        signOutButton = x.findViewById(R.id.nav_sign_out)
+        signOutButton.setOnClickListener {
+            signOut()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -100,15 +103,6 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    /**
-     * TODO: setup logout
-     */
-    private fun setupUI() {
-        sign_out_button.setOnClickListener {
-            signOut()
-        }
     }
 
     private fun signOut() {
