@@ -9,9 +9,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 
 import edu.calbaptist.bible_ly.R
-import java.util.*
-
-
 
 
 private const val ARG_EVENT_ID = "eventID"
@@ -39,7 +36,7 @@ class EventFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view = inflater.inflate(R.layout.event_fragment, container, false)
+        val view = inflater.inflate(R.layout.event_detailed_fragment, container, false)
 
         titleEditText = view.findViewById(R.id.et_event_frag_title)
         val myValue = this.arguments!!.getInt("eventID")

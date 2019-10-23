@@ -21,7 +21,7 @@ class BibleFragment : Fragment() {
     ): View? {
         bibleViewModel =
             ViewModelProviders.of(this).get(BibleViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_slideshow, container, false)
+        val root = inflater.inflate(R.layout.fragment_bible, container, false)
         val textView: TextView = root.findViewById(R.id.text_slideshow)
         bibleViewModel.text.observe(this, Observer {
             textView.text = it
