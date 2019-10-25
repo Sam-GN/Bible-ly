@@ -59,7 +59,7 @@ data class Event(
     var startDate: Date? = null,
     var endDate: Date? = null,
     var description: String = "Event desc",
-    val className: Class? = null
+    val className: String? = null
 )
 
 data class ClassMember(
