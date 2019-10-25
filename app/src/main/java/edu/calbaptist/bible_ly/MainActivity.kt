@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity() {
 
 // ...
 
-            val user = User(1, "Sam","123","")
-            database.child("users").child("1").setValue(user)
+           /* val user = User(1, "Sam","123","")
+            database.child("users").child("1").setValue(user)*/
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
