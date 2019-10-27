@@ -1,14 +1,19 @@
 package edu.calbaptist.bible_ly
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 data class Class(
-    val classID: Int,
-    val teacher: User,
+    val classID: String,
+    var teacher: User?,
     var isPublic: Boolean,
     var name: String,
-    var description: String
-)  //class downt need event because in database multiple events
+    var description: String,
+    var students: ArrayList<User>
+){
+    constructor() : this( "",null,true, "","",ArrayList<User>())
+}
+//class dont need event because in database multiple events
 //will have the same class as classID
 
 data class Verse(
@@ -20,12 +25,14 @@ data class Verse(
 )
 
 data class User(
-    val userID: Int,
+   // val userID: Int,
     val userName: String,
-    val password: String,
-    val email: String
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val photoID: String
 ) {
-    constructor() : this(0, "", "", "")
+    constructor() : this( "","","", "","")
 }
 
 data class Note(

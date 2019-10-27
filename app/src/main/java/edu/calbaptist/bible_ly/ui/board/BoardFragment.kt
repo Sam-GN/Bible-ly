@@ -58,7 +58,7 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
     private lateinit var homeViewModel: HomeViewModel
 
     private lateinit var notificationRecyclerView: RecyclerView
-   // private  var adapter: NotificationAdapter = NotificationAdapter()
+   // private  var studentAdapter: NotificationAdapter = NotificationAdapter()
    lateinit var adapter: BoardAdapter
 
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -178,11 +178,11 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
     }
 
     private fun updateUI(crimes: MutableList<BoardRecycleViewItem>) {
-      /*  adapter!!.submitList(crimes)
+      /*  studentAdapter!!.submitList(crimes)
 //
-      //  adapter = NotificationAdapter(crimes)
+      //  studentAdapter = NotificationAdapter(crimes)
 
-        notificationRecyclerView.adapter = adapter*/
+        notificationRecyclerView.studentAdapter = studentAdapter*/
 
     }
 

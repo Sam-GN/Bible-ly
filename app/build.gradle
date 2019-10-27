@@ -46,6 +46,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:17.0.0'
     implementation 'com.google.firebase:firebase-firestore:21.1.1'
 
+    //Glide for loading images
+    implementation 'com.github.bumptech.glide:glide:4.0.0'
+
+    //For Custom FAB
+    implementation 'com.getbase:floatingactionbutton:1.10.1'
+
+    // implementation 'uk.co.markormesher:android-fab:2.2.2'
+
     //play service auth
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
