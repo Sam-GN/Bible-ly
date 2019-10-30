@@ -4,14 +4,25 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import edu.calbaptist.bible_ly.Class
 import edu.calbaptist.bible_ly.Event
+import edu.calbaptist.bible_ly.MainActivity
 import edu.calbaptist.bible_ly.R
 import kotlinx.android.synthetic.main.list_class_item_class.view.*
 import kotlinx.android.synthetic.main.list_event_item_board.view.*
+import java.io.IOException
+
+
+
+
 
 open class ClassAdapter (query: Query, private val listener: OnClassItemSelectedListener) :
     FirestoreAdapter<ClassAdapter.ViewHolder>(query) {
@@ -63,8 +74,35 @@ open class ClassAdapter (query: Query, private val listener: OnClassItemSelected
 
 
             Log.i("BoardAdapter",biblelyClass.name)
+            var ivLogo = itemView.findViewById<ImageView>(R.id.iv_class_item_logo)
+            if(biblelyClass.classLogo != "") {
+                try {
+                    Glide.with(ivLogo.context)
+
+                        .applyDefaultRequestOptions( RequestOptions()
+                            .placeholder(R.drawable.ic_class_logo_default2)
+                            .error(R.drawable.ic_class_logo_default2)
+                            )
+                        //.applyDefaultRequestOptions( RequestOptions())
+                        //.setDefaultRequestOptions(RequestOptions())
+                        .load(biblelyClass.classLogo)
+                        .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(30)))
+                        //.apply(RequestOptions.centerCropTransform())
+//                         .apply(RequestOptions.circleCropTransform())
+
+                        .into(ivLogo)
+
+                }catch (e: IOException){
+                    Log.e("BoardAdapter",e.message)
+                    ivLogo.setImageResource(R.drawable.ic_class_logo_default2)
+                }
+
+            } else {
+                ivLogo.setImageResource(R.drawable.ic_class_logo_default2)
+            }
             itemView.tv_class_item_title.text = biblelyClass.name
             itemView.tv_class_item_teacher.text = biblelyClass.teacher?.userName
+
             // Click listener
             itemView.setOnClickListener {
                 listener?.onClassItemSelected(snapshot)

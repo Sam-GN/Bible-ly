@@ -1,17 +1,27 @@
 package edu.calbaptist.bible_ly
 
+import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
+data class Token(
+    @ServerTimestamp
+    var timeStamp: Date? = null,
+    var id:String
+){
+    constructor() : this( null,"")
+}
 data class Class(
     val classID: String,
     var teacher: User?,
     var isPublic: Boolean,
     var name: String,
     var description: String,
-    var students: ArrayList<User>
+    var students: ArrayList<User>,
+    var classLogo: String,
+    var tokens: Map<String,Date>
 ){
-    constructor() : this( "",null,true, "","",ArrayList<User>())
+    constructor() : this( "",null,true, "","",ArrayList<User>(),"", mapOf())
 }
 //class dont need event because in database multiple events
 //will have the same class as classID

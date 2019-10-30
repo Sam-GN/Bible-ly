@@ -18,9 +18,11 @@ import android.view.Menu
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var database: DatabaseReference
-    private lateinit var signOutButton: Button
+    private lateinit var signOutButton: MaterialButton
     private lateinit var tvNavName: TextView
     private lateinit var tvNavEmail: TextView
     private lateinit var ivNav: ImageView
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
 
 
+        getServerTimeStamp{a->Toast.makeText(this,a.toDate().toString(),Toast.LENGTH_SHORT).show()}
 
         // the below code is for firebase testing purposes
         database.child("users").addValueEventListener(object : ValueEventListener {
