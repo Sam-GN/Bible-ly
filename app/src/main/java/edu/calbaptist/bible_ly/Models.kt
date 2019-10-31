@@ -1,15 +1,17 @@
 package edu.calbaptist.bible_ly
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
 data class Token(
-    @ServerTimestamp
-    var timeStamp: Date? = null,
-    var id:String
+
+    var expireDate: Date? = null,
+    var id:String,
+    var user:User? = null
 ){
-    constructor() : this( null,"")
+    constructor() : this( null,"",null)
 }
 data class Class(
     val classID: String,
@@ -19,9 +21,9 @@ data class Class(
     var description: String,
     var students: ArrayList<User>,
     var classLogo: String,
-    var tokens: Map<String,Date>
+    var tokens: ArrayList<Token>
 ){
-    constructor() : this( "",null,true, "","",ArrayList<User>(),"", mapOf())
+    constructor() : this( "",null,true, "","",ArrayList<User>(),"", ArrayList<Token>())
 }
 //class dont need event because in database multiple events
 //will have the same class as classID
@@ -70,13 +72,12 @@ data class Question(
 )
 
 data class Event(
-    var eventID: Int = 0,
     var name: String = "name",
-    var repeat: Int = 0,
-    var startDate: Date? = null,
-    var endDate: Date? = null,
+//    var repeat: Int = 0,
+    var date: String ="",
+//    var endDate: Date? = null,
     var description: String = "Event desc",
-    val className: String? = null
+    val clss: Class? = null
 )
 
 data class ClassMember(

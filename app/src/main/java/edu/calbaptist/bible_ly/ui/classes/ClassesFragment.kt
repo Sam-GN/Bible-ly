@@ -31,18 +31,18 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.getbase.floatingactionbutton.FloatingActionsMenu.OnFloatingActionsMenuUpdateListener
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import edu.calbaptist.bible_ly.*
+import edu.calbaptist.bible_ly.R
 import edu.calbaptist.bible_ly.adapter.ClassAdapter
+import kotlinx.android.synthetic.main.content_class_single.*
 import kotlinx.android.synthetic.main.dialogue_join_class.view.*
 import kotlinx.android.synthetic.main.dialogue_new_class.*
 import kotlinx.android.synthetic.main.dialogue_new_class.view.*
 import kotlinx.android.synthetic.main.fragment_classes.*
+import kotlinx.android.synthetic.main.fragment_classes.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -103,6 +103,8 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
             //.limit()
             .whereEqualTo("teacher",MainActivity.user)
         // RecyclerView
+        root.tv_class_teacherRV_label.visibility = View.GONE
+        root.tv_class_studentRV_label.visibility = View.GONE
         studentAdapter = object : ClassAdapter(query, this@ClassesFragment) {
             override fun onDataChanged() {
                 // Show/hide content if the query returns empty.
@@ -256,9 +258,76 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                 .setView(view).create()
 
             dialoge.show()
+
             view.btn_class_join.setOnClickListener {
-                dialoge.dismiss()
-                fab.collapse()
+                var id = view.tf_class_join_token.editText!!.text
+                FirebaseFirestore.getInstance().collection("Class").get()
+                    .addOnSuccessListener { document ->
+                        if (document != null) {
+                            getServerTimeStamp { current ->
+                                var classes = document.documents
+                                for (clss in classes) {
+                                    var c = clss.toObject(Class::class.java)
+                                    for (t in c!!.tokens) {
+                                        if (t.id == id.toString()) {
+
+                                            if (t.expireDate!!.after(current.toDate())) {
+                                                FirebaseFirestore.getInstance()
+                                                    .document(clss.reference.path).update(
+                                                        "students",
+                                                        FieldValue.arrayUnion(MainActivity.user)
+                                                    )
+                                                 FirebaseFirestore.getInstance()
+                                                    .document(clss.reference.path)
+                                                    .collection("students")
+                                                    .whereEqualTo("email", MainActivity.user.email).get()
+                                                    .addOnSuccessListener { documents ->
+                                                        if(documents.isEmpty){
+                                                            FirebaseFirestore.getInstance()
+                                                                .document(clss.reference.path)
+                                                                .collection("students").document().set(MainActivity.user)
+                                                        }
+                                                        else{
+                                                            Toast.makeText(requireContext(),"You are already in this class",Toast.LENGTH_LONG).show()
+                                                            FirebaseFirestore.getInstance()
+                                                                .document(clss.reference.path)
+                                                                .collection("students").document().set(MainActivity.user)
+                                                        }
+
+                                                    }
+
+
+                                            } else {
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "Token Expired.",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
+                                            dialoge.dismiss()
+                                            fab.collapse()
+                                            return@getServerTimeStamp
+                                        }
+
+                                    }
+                                }
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Invalid Token.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                            }
+                        } else {
+                            // Log.d(TAG, "No such document")
+                        }
+
+                    }
+                            .addOnFailureListener { exception ->
+                                //  Log.d(TAG, "get failed with ", exception)
+                            }
+
+
             }
         }
 
@@ -392,8 +461,8 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                     Toast.makeText(requireContext(), downloadUri.toString(), Toast.LENGTH_SHORT).show()
 
                     var studentList = ArrayList<User>()
-                    studentList.add(MainActivity.user)
-                    studentList.add(MainActivity.user)
+//                    studentList.add(MainActivity.user)
+//                    studentList.add(MainActivity.user)
                     var biblelyClass = Class(
                         "",
                         MainActivity.user,
@@ -402,7 +471,7 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                         dialogView.et_class_new_description.text.toString(),
                         studentList,
                         downloadUri.toString(),
-                        mapOf()
+                        ArrayList<Token>()
                     )
                     val fireStore = FirebaseFirestore.getInstance()
                     val eventRef = fireStore.collection("Class").document()
@@ -431,7 +500,7 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                 dialogView.et_class_new_description.text.toString(),
                 studentList,
                 "",
-               mapOf()
+               ArrayList<Token>()
             )
             val fireStore = FirebaseFirestore.getInstance()
             val eventRef = fireStore.collection("Class").document()

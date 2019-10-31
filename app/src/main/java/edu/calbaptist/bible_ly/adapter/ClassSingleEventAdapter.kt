@@ -10,26 +10,24 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import edu.calbaptist.bible_ly.Event
 import edu.calbaptist.bible_ly.R
-import kotlinx.android.synthetic.main.list_event_item_board.view.*
-import kotlinx.android.synthetic.main.list_event_item_board.view.notification_date
-import kotlinx.android.synthetic.main.list_event_item_board.view.notification_title
-import kotlinx.android.synthetic.main.list_notification_item_board.view.*
+import kotlinx.android.synthetic.main.list_class_single_item_event.view.*
 
 
-open class BoardAdapter(query: Query, private val listener: OnBoardItemSelectedListener) :
-    FirestoreAdapter<BoardAdapter.ViewHolder>(query) {
 
-    interface OnBoardItemSelectedListener {
+open class ClassSingleEventAdapter(query: Query, private val listener: OnClassSingleEventItemSelectedListener) :
+    FirestoreAdapter<ClassSingleEventAdapter.ViewHolder>(query) {
 
-        fun onBoardItemSelected(boardItem: DocumentSnapshot)
+    interface OnClassSingleEventItemSelectedListener {
+
+        fun onClassSingleEventItemSelected(ClassSingleEventItem: DocumentSnapshot)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
        // if(viewType==0)
-            return ViewHolder(inflater.inflate(R.layout.list_event_item_board, parent, false))
+            return ViewHolder(inflater.inflate(R.layout.list_class_single_item_event, parent, false))
        // else
-         //   return ViewHolder(inflater.inflate(R.layout.list_notification_item_board, parent, false))
+         //   return ViewHolder(inflater.inflate(R.layout.list_notification_item_ClassSingleEvent, parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -40,7 +38,7 @@ open class BoardAdapter(query: Query, private val listener: OnBoardItemSelectedL
 
         fun bind(
             snapshot: DocumentSnapshot,
-            listener: OnBoardItemSelectedListener?
+            listener: OnClassSingleEventItemSelectedListener?
         ) {
 
             val event = snapshot.toObject(Event::class.java) ?: return
@@ -63,12 +61,12 @@ open class BoardAdapter(query: Query, private val listener: OnBoardItemSelectedL
                 numRatings)
             itemView.restaurantItemPrice.text = RestaurantUtil.getPriceString(event)*/
 
-            Log.i("BoardAdapter",event.name)
-            itemView.notification_title.text = event.name
-            //itemView.notification_date.text = event.startDate.toString() + " - " + event.endDate.toString()
+            Log.i("ClassSingleEventAdapter",event.name)
+            itemView.tv_class_event_name.text = event.name
+            itemView.tv_class_event_description.text = event.description
             // Click listener
             itemView.setOnClickListener {
-                listener?.onBoardItemSelected(snapshot)
+                listener?.onClassSingleEventItemSelected(snapshot)
             }
         }
     }

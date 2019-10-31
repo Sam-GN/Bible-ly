@@ -37,7 +37,7 @@ class HomeViewModel : ViewModel() {
             boardRecycleViewItem+=(temp)
         }
         boardRecycleViewItem.sortBy { a->a.date }
-        for (i in 0 until 5) {
+        /*for (i in 0 until 5) {
             val event = Event()
             event.eventID = i
             event.endDate = Date()
@@ -47,11 +47,11 @@ class HomeViewModel : ViewModel() {
             event.name = "Event #$i"
             event.description ="this is fun #$i"
           //  saveEvent(event )
-            val temp = BoardRecycleViewItem(event.eventID, event.name,"${sdf.format(event.startDate)} - ${sdf.format(event.endDate)}",
-                event.className,0)
+         *//*   val temp = BoardRecycleViewItem(event.eventID, event.name,"${sdf.format(event.startDate)} - ${sdf.format(event.endDate)}",
+                event.className,0)*//*
 
-            boardRecycleViewItem+=(temp)
-        }
+          //  boardRecycleViewItem+=(temp)
+        }*/
 
 
 

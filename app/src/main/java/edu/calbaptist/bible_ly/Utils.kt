@@ -8,6 +8,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.content_class_single.*
+import java.util.*
 
 
 fun getScaledBitmap (path: String, activity: Activity): Bitmap {
@@ -60,5 +61,28 @@ fun getServerTimeStamp(callback: (Timestamp) -> Unit){
             }
     }
 
+
+}
+fun addDay(t:Timestamp,dayNum:Int): Date{
+    var c = Calendar.getInstance()
+    c.time = t.toDate()
+    c.add(Calendar.DAY_OF_YEAR,dayNum)
+    return c.time
+}
+
+fun extendToken(tokenTime:Timestamp, currentTime: Timestamp): Date{
+    var ctoken = Calendar.getInstance()
+    ctoken.time = tokenTime.toDate()
+
+    var calCurrentTime = Calendar.getInstance()
+    calCurrentTime.time = currentTime.toDate()
+
+    var temporaryCalendar = ctoken
+
+    if( calCurrentTime.before(temporaryCalendar.add(Calendar.HOUR,12))) {
+        ctoken.add(Calendar.HOUR, 12)
+    }
+
+        return ctoken.time
 
 }
