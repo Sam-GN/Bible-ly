@@ -65,7 +65,7 @@ open class BoardAdapter(query: Query, private val listener: OnBoardItemSelectedL
 
             Log.i("BoardAdapter",event.name)
             itemView.notification_title.text = event.name
-            itemView.notification_date.text = event.startDate.toString() + " - " + event.endDate.toString()
+            //itemView.notification_date.text = event.startDate.toString() + " - " + event.endDate.toString()
             // Click listener
             itemView.setOnClickListener {
                 listener?.onBoardItemSelected(snapshot)

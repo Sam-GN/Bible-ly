@@ -1,14 +1,31 @@
 package edu.calbaptist.bible_ly
 
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
+import kotlin.collections.ArrayList
 
+data class Token(
+
+    var expireDate: Date? = null,
+    var id:String,
+    var user:User? = null
+){
+    constructor() : this( null,"",null)
+}
 data class Class(
-    val classID: Int,
-    val teacher: User,
+    val classID: String,
+    var teacher: User?,
     var isPublic: Boolean,
     var name: String,
-    var description: String
-)  //class downt need event because in database multiple events
+    var description: String,
+    var students: ArrayList<User>,
+    var classLogo: String,
+    var tokens: ArrayList<Token>
+){
+    constructor() : this( "",null,true, "","",ArrayList<User>(),"", ArrayList<Token>())
+}
+//class dont need event because in database multiple events
 //will have the same class as classID
 
 data class Verse(
@@ -20,12 +37,14 @@ data class Verse(
 )
 
 data class User(
-    val userID: Int,
+   // val userID: Int,
     val userName: String,
-    val password: String,
-    val email: String
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val photoID: String
 ) {
-    constructor() : this(0, "", "", "")
+    constructor() : this( "","","", "","")
 }
 
 data class Note(
@@ -53,13 +72,12 @@ data class Question(
 )
 
 data class Event(
-    var eventID: Int = 0,
     var name: String = "name",
-    var repeat: Int = 0,
-    var startDate: Date? = null,
-    var endDate: Date? = null,
+//    var repeat: Int = 0,
+    var date: String ="",
+//    var endDate: Date? = null,
     var description: String = "Event desc",
-    val className: String? = null
+    val clss: Class? = null
 )
 
 data class ClassMember(

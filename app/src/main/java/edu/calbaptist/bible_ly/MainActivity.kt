@@ -1,12 +1,10 @@
 package edu.calbaptist.bible_ly
 
-import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -18,15 +16,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import java.util.ArrayList
+import com.google.firebase.firestore.FirebaseFirestore
 
+
+private const val TAG = "UserFireStore"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var database: DatabaseReference
-    private lateinit var signOutButton: Button
+    private lateinit var signOutButton: MaterialButton
+    private lateinit var tvNavName: TextView
+    private lateinit var tvNavEmail: TextView
+    private lateinit var ivNav: ImageView
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +47,9 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         database = FirebaseDatabase.getInstance().reference
+
+
+        getServerTimeStamp{a->Toast.makeText(this,a.toDate().toString(),Toast.LENGTH_SHORT).show()}
 
         // the below code is for firebase testing purposes
         database.child("users").addValueEventListener(object : ValueEventListener {
@@ -62,17 +78,40 @@ class MainActivity : AppCompatActivity() {
 //        }
 //        database.child("users").addValueEventListener(postListener)
 
-        val fab: FloatingActionButton = findViewById(R.id.fab)
 
 
-        fab.setOnClickListener { view ->
-            // Write a message to the database
+        val acct = GoogleSignIn.getLastSignedInAccount(this)
+        if (acct != null) {
+            val personName = acct.displayName
+            val personGivenName = acct.givenName
+            val personFamilyName = acct.familyName
+            val personEmail = acct.email
+            val personId = acct.id
+            val personPhoto = acct.photoUrl
 
-// ...
-
-            val user = User(1, "Sam","123","")
-            database.child("users").child("1").setValue(user)
+            val firestore = FirebaseFirestore.getInstance()
+            val usersRef = firestore.collection("User").document(personEmail!!)
+            /*   // Add restaurant
+               batch.set(eventRef, event)*/
+            user = User(personName!!,personGivenName!!,personFamilyName!!,personEmail,personPhoto.toString()!!)
+            usersRef.set( user)
+           /* usersRef.get()
+                .addOnSuccessListener { document ->
+                 *//*   if (document != null) {
+                        Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                    } else {
+                        Log.d(TAG, "No such document")
+                     //   val usersRef = firestore.collection("User").document()*//*
+                        firestore.batch().set(usersRef, user)
+                //    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d(TAG, "get failed with ", exception)
+                }*/
         }
+
+
+
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -87,11 +126,24 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        var x =navView.getHeaderView(0)
-        signOutButton = x.findViewById(R.id.nav_sign_out)
+        var navHeader =navView.getHeaderView(0)
+        signOutButton = navHeader.findViewById(R.id.nav_sign_out)
+        tvNavName = navHeader.findViewById(R.id.tvNavName)
+        tvNavEmail = navHeader.findViewById(R.id.tvNavEmail)
+        ivNav = navHeader.findViewById(R.id.ivNav)
         signOutButton.setOnClickListener {
             signOut()
         }
+        updateNavHeader()
+    }
+
+    fun updateNavHeader(){
+        tvNavName.text = user.userName
+        tvNavEmail.text = user.email
+        Glide.with(ivNav.context)
+            .load(user.photoID)
+            .apply(RequestOptions.circleCropTransform())
+            .into(ivNav)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -114,5 +166,7 @@ class MainActivity : AppCompatActivity() {
         fun getLaunchIntent(from: Context) = Intent(from, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
+        lateinit var user:User
+
     }
 }
