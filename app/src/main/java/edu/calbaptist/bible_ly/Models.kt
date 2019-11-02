@@ -5,15 +5,25 @@ import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
-data class Token(
 
-    var expireDate: Date? = null,
+
+
+
+data class Token (
+    var expireDate: Date?,
     var id:String,
-    var user:User? = null
-){
+    var user:User?)
+
+
+    /*var expireDate: Date? = null,
+    var id:String,
+    var user:User? = null*/
+
+{
     constructor() : this( null,"",null)
 }
-data class Class(
+
+data class Class (
     val classID: String,
     var teacher: User?,
     var isPublic: Boolean,
@@ -74,7 +84,7 @@ data class Question(
 data class Event(
     var name: String = "name",
 //    var repeat: Int = 0,
-    var date: String ="",
+    var date: Date? =null,
 //    var endDate: Date? = null,
     var description: String = "Event desc",
     val clss: Class? = null

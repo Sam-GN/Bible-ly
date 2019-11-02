@@ -2,34 +2,24 @@ package edu.calbaptist.bible_ly
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.ActionBar
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.common.math.Quantiles
 import com.google.firebase.firestore.*
-import edu.calbaptist.bible_ly.adapter.ClassAdapter
 import edu.calbaptist.bible_ly.adapter.StudentAdapter
 import kotlinx.android.synthetic.main.activity_class_single.*
 import kotlinx.android.synthetic.main.content_class_single.*
-import kotlinx.android.synthetic.main.list_class_item_class.*
-import com.google.firebase.firestore.FieldValue.serverTimestamp
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.DatePicker
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import edu.calbaptist.bible_ly.adapter.ClassSingleEventAdapter
-import kotlinx.android.synthetic.main.event_detailed_fragment.*
+import edu.calbaptist.bible_ly.ui.EventFragment
 import kotlinx.android.synthetic.main.event_detailed_fragment.view.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -49,10 +39,15 @@ private lateinit var classTokens: ArrayList<Token>
 private lateinit var path: String
 private var iAmTeacher: Boolean = false
 private lateinit var mmenu: Menu
-private var classs: Class? = null
+
 
 class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSelectedListener, ClassSingleEventAdapter.OnClassSingleEventItemSelectedListener {
     override fun onClassSingleEventItemSelected(ClassSingleEventItem: DocumentSnapshot) {
+         var d = EventDialog.newInstance(false, iAmTeacher , path,ClassSingleEventItem.reference.path)
+//        d.show(requireFragmentManager(),"")
+
+        val fm = supportFragmentManager
+        d.show(fm,"EventDialog")
 
     }
 
@@ -217,26 +212,69 @@ class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSel
 
 
         btn_class_single_new_event.setOnClickListener {
-            val view = layoutInflater.inflate(R.layout.event_detailed_fragment, null)
+           /* val view = layoutInflater.inflate(R.layout.event_detailed_fragment, null)
             view.tf_event_frag_className.editText!!.setText(classs!!.name)
             view.tf_event_frag_className.isEnabled = false
+            view.btn_event_frag_date.setOnClickListener {
+                var datePicker = DatePicker(this)
+
+                var dialoge2 = AlertDialog.Builder(this)
+                    .setTitle("Pick Date")
+                    .setCancelable(false)
+                    .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+                        //Action goes here
+                    })
+                    .setPositiveButton("Select", DialogInterface.OnClickListener { dialog, which ->
+                        //view.btn_event_frag_date.tag = datePicker.getCalendarFromDatePicker()
+                        getTime(view.btn_event_frag_date,this,datePicker.getCalendarFromDatePicker())
+
+                    })
+                    .setView(datePicker).create()
+
+                dialoge2.show()
+            }
+
+
             var dialoge = AlertDialog.Builder(this)
                 .setTitle("New Event")
-                .setCancelable(false)
+
                 .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
                     //Action goes here
                 })
                 .setPositiveButton("Create", DialogInterface.OnClickListener { dialog, which ->
-                    var ev = Event(view.et_event_frag_title.text.toString(),view.et_event_frag_date.text.toString(),"",classs)
-                    var ref = FirebaseFirestore.getInstance().collection("Event").document()
-                    ref.set(ev)
+
                 })
+                .setCancelable(false)
                 .setView(view).create()
 
             dialoge.show()
+            (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                if(view.et_event_frag_title.text.toString().isEmpty()){
+                    Toast.makeText(this,"Title is required.",Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if(view.btn_event_frag_date.tag==null){
+                    Toast.makeText(this,"Date is required.",Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                var ev = Event(view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time
+                    ,view.et_event_frag_description.text.toString()
+                    ,classs)
+                var ref = FirebaseFirestore.getInstance().collection("Event").document()
+                ref.set(ev)
+                dialoge.dismiss()
+            }*/
+            var d = EventDialog.newInstance(true,iAmTeacher, path,"")
+//        d.show(requireFragmentManager(),"")
+
+            val fm = supportFragmentManager
+            d.show(fm,"EventDialog")
+
         }
 
     }
+
+
 
     override fun onStart() {
         super.onStart()
@@ -311,4 +349,7 @@ class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSel
 
      }*/
 
+    companion object{
+        var classs: Class? = null
+    }
 }

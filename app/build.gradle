@@ -4,6 +4,10 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'org.jetbrains.kotlin.android.extensions'
+
+
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -20,6 +24,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    androidExtensions {
+        experimental = true
+    }
+
 }
 
 
@@ -57,7 +65,14 @@ dependencies {
     //play service auth
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
 
-    testImplementation 'junit:junit:4.12'
+
+
+
+
+
+
+
+testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 }

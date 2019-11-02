@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="110dp"
-    android:layout_height="wrap_content"
+    android:layout_width="180dp"
+    android:layout_height="205dp"
 
     android:padding="5dp">
 
@@ -13,22 +13,22 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/groupCardView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:cardCornerRadius="10dp"
         app:cardElevation="5dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="5dp">
 
 
             <TextView
@@ -37,14 +37,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
                 android:layout_marginEnd="5dp"
+                android:maxLines="1"
+                android:paddingTop="5dp"
                 android:text="Title"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="13sp"
+                app:layout_constraintEnd_toStartOf="@+id/ib_class_event_options"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/ib_class_event_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/ic_more_vert_black_24dp"
+                android:layout_marginStart="5dp"
+                android:visibility="gone"/>
+
+            <TextView
+
+                android:id="@+id/tv_class_event_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:textColor="@color/colorAccent"
+                android:text="Date"
+                android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/iv_class_students"
+                app:layout_constraintTop_toBottomOf="@+id/tv_class_event_name"
                 android:maxLines="1"/>
 
             <TextView
@@ -60,8 +87,8 @@
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_class_event_name"
-                android:maxLines="1"/>
+                app:layout_constraintTop_toBottomOf="@+id/tv_class_event_date"
+                android:maxLines="7"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

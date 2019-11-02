@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
 
 
-        getServerTimeStamp{a->Toast.makeText(this,a.toDate().toString(),Toast.LENGTH_SHORT).show()}
+        //getServerTimeStamp{a->Toast.makeText(this,a.toDate().toString(),Toast.LENGTH_SHORT).show()}
 
         // the below code is for firebase testing purposes
         database.child("users").addValueEventListener(object : ValueEventListener {
