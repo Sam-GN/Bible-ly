@@ -26,13 +26,17 @@ import java.io.IOException
 
 
 
-open class StudentAdapter (query: Query, private val listener: OnStudentItemSelectedListener) :
+open class StudentAdapter (query: Query, private val listener: OnStudentItemSelectedListener, private val listenerMore: OnMoreItemSelectedListener) :
     FirestoreAdapter<StudentAdapter.ViewHolder>(query) {
 
 
     interface OnStudentItemSelectedListener {
 
         fun onStudentItemSelected(StudentItem: DocumentSnapshot)
+    }
+    interface OnMoreItemSelectedListener {
+
+        fun onMoreItemSelected(view: View,StudentItem: DocumentSnapshot)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,14 +48,15 @@ open class StudentAdapter (query: Query, private val listener: OnStudentItemSele
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getSnapshot(position), listener)
+        holder.bind(getSnapshot(position), listener,listenerMore)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(
             snapshot: DocumentSnapshot,
-            listener: OnStudentItemSelectedListener?
+            listener: OnStudentItemSelectedListener?,
+            listenerMore:OnMoreItemSelectedListener?
         ) {
 
             val biblelyStudent = snapshot.toObject(User::class.java) ?: return
@@ -90,6 +95,9 @@ open class StudentAdapter (query: Query, private val listener: OnStudentItemSele
             // Click listener
             itemView.setOnClickListener {
                 listener?.onStudentItemSelected(snapshot)
+            }
+            itemView.ib_class_students_options.setOnClickListener {
+                listenerMore?.onMoreItemSelected(itemView.ib_class_students_options, snapshot)
             }
         }
     }

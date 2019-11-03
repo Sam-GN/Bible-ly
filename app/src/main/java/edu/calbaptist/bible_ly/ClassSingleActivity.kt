@@ -16,6 +16,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.DatePicker
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import edu.calbaptist.bible_ly.adapter.ClassSingleEventAdapter
@@ -30,7 +31,7 @@ private lateinit var  classesAsStudentRecycleView: RecyclerView
 private lateinit var  eventRecycleView: RecyclerView
 lateinit var firestore: FirebaseFirestore
 lateinit var studentAdapter: StudentAdapter
-lateinit var eventAdapter: ClassSingleEventAdapter
+var eventAdapter: ClassSingleEventAdapter?=null
 lateinit var query: Query
 private lateinit var studentLinearLayoutManager: LinearLayoutManager
 private lateinit var eventLinearLayoutManager: LinearLayoutManager
@@ -41,18 +42,83 @@ private var iAmTeacher: Boolean = false
 private lateinit var mmenu: Menu
 
 
-class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSelectedListener, ClassSingleEventAdapter.OnClassSingleEventItemSelectedListener {
+class ClassSingleActivity : AppCompatActivity()
+    , StudentAdapter.OnStudentItemSelectedListener
+    , StudentAdapter.OnMoreItemSelectedListener
+    , ClassSingleEventAdapter.OnClassSingleEventItemSelectedListener {
+    override fun onMoreItemSelected(view: View, StudentItem: DocumentSnapshot) {
+        if(iAmTeacher){
+            showPopupStudent(view,StudentItem)
+        }
+    }
+    private fun showPopupStudent(view: View,snapshot: DocumentSnapshot) {
+        var popup: PopupMenu? = null;
+        popup = PopupMenu(view.context, view)
+        popup.inflate(R.menu.menu_students_item_more)
+
+
+        popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+
+            when (item!!.itemId) {
+                R.id.students_item_action_delete-> {
+
+                    var dialoge = AlertDialog.Builder(view.context)
+                        .setCancelable(false)
+                        .setTitle("Are you sure you want to remove the student?")
+                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                            //Action goes here
+                        })
+                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                            //snapshot.reference.delete()
+                            //FirebaseFirestore.getInstance().document(path).
+                            val biblelyStudent = snapshot.toObject(User::class.java)
+
+                            FirebaseFirestore.getInstance()
+                                .document(path).update(
+                                    "students",
+                                    FieldValue.arrayRemove(biblelyStudent)
+                                )
+                            FirebaseFirestore.getInstance().document(path).collection("students")
+                                .whereEqualTo("email", biblelyStudent?.email).get()
+                                .addOnSuccessListener { document ->
+                                    document?.forEach { d -> d.reference.delete() }
+
+                                }
+                            Toast.makeText(view.context,  "Student Removed", Toast.LENGTH_SHORT).show()
+                            // this.finish()
+                        })
+                        .create()
+
+                    dialoge.show()
+
+                }
+                /* R.id.header2 -> {
+                     Toast.makeText(this@MainActivity, item.title, Toast.LENGTH_SHORT).show();
+                 }
+                 R.id.header3 -> {
+                     Toast.makeText(this@MainActivity, item.title, Toast.LENGTH_SHORT).show();
+                 }*/
+            }
+
+            true
+        })
+
+        popup.show()
+    }
     override fun onClassSingleEventItemSelected(ClassSingleEventItem: DocumentSnapshot) {
          var d = EventDialog.newInstance(false, iAmTeacher , path,ClassSingleEventItem.reference.path)
 //        d.show(requireFragmentManager(),"")
 
         val fm = supportFragmentManager
         d.show(fm,"EventDialog")
-
     }
 
     override fun onStudentItemSelected(StudentItem: DocumentSnapshot) {
+        var d = StudentDialog.newInstance(StudentItem.reference.path)
+//        d.show(requireFragmentManager(),"")
 
+        val fm = supportFragmentManager
+        d.show(fm,"StudentDialog")
     }
 
     //lateinit var mySupportActionBar: ActionBar
@@ -98,7 +164,7 @@ class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSel
                     }
 
                     eventRecycleView.adapter = eventAdapter
-                    eventAdapter.startListening()
+                    eventAdapter!!.startListening()
 
 
                 } else {
@@ -187,7 +253,7 @@ class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSel
         //.where("students",MainActivity.user)
 
         // RecyclerView
-        studentAdapter = object : StudentAdapter(query, this@ClassSingleActivity) {
+        studentAdapter = object : StudentAdapter(query, this@ClassSingleActivity,this@ClassSingleActivity) {
             override fun onDataChanged() {
                 // Show/hide content if the query returns empty.
                 Log.i("ClassFragment student", itemCount.toString())
@@ -290,14 +356,15 @@ class ClassSingleActivity : AppCompatActivity(), StudentAdapter.OnStudentItemSel
 
         // Start listening for Firestore updates
         studentAdapter.startListening()
-//        eventAdapter.startListening()
+        if(eventAdapter!=null)
+            eventAdapter!!.startListening()
 
     }
 
     override fun onStop() {
         super.onStop()
         studentAdapter.stopListening()
-        eventAdapter.stopListening()
+        eventAdapter!!.stopListening()
 
     }
 

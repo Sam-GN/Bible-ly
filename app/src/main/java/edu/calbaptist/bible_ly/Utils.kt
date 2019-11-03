@@ -6,14 +6,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
-import android.widget.Button
+import android.util.Log
+import android.widget.*
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.content_class_single.*
 import java.util.*
-import android.widget.DatePicker
-import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import java.io.IOException
 import java.text.SimpleDateFormat
 
 
@@ -47,6 +49,13 @@ fun getScaledBitmap(path: String, destWidth: Int, destHeight: Int): Bitmap {
 
     return BitmapFactory.decodeFile(path, options)
 }
+fun getUser(path:String,callback: (User) -> Unit){
+    FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
+        if (it != null) {
+            callback( it.toObject(User::class.java) as User)
+        }
+    }
+}
 fun getClass(path:String,callback: (Class) -> Unit){
     FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
         if (it != null) {
@@ -59,6 +68,60 @@ fun getEvent(path:String,callback: (Event) -> Unit){
         if (it != null) {
             callback( it.toObject(Event::class.java) as Event)
         }
+    }
+}
+fun ImageButton.setGlide(imagePath: String){
+    if(imagePath!= "") {
+        try {
+            Glide.with(this.context)
+
+                .applyDefaultRequestOptions( RequestOptions()
+                    .placeholder(R.mipmap.ic_launcher2_round)
+                    .error(R.mipmap.ic_launcher2_round)
+                )
+                //.applyDefaultRequestOptions( RequestOptions())
+                //.setDefaultRequestOptions(RequestOptions())
+                .load(imagePath)
+                // .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(30)))
+                //.apply(RequestOptions.centerCropTransform())
+                .apply(RequestOptions.circleCropTransform())
+
+                .into(this)
+
+        }catch (e: IOException){
+            Log.e("BoardAdapter",e.message)
+            this.setImageResource(R.mipmap.ic_launcher2_round)
+        }
+
+    } else {
+        this.setImageResource(R.mipmap.ic_launcher2_round)
+    }
+}
+fun ImageView.setGlide(imagePath: String){
+    if(imagePath!= "") {
+        try {
+            Glide.with(this.context)
+
+                .applyDefaultRequestOptions( RequestOptions()
+                    .placeholder(R.mipmap.ic_launcher2_round)
+                    .error(R.mipmap.ic_launcher2_round)
+                )
+                //.applyDefaultRequestOptions( RequestOptions())
+                //.setDefaultRequestOptions(RequestOptions())
+                .load(imagePath)
+                // .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(30)))
+                //.apply(RequestOptions.centerCropTransform())
+                .apply(RequestOptions.circleCropTransform())
+
+                .into(this)
+
+        }catch (e: IOException){
+            Log.e("BoardAdapter",e.message)
+            this.setImageResource(R.mipmap.ic_launcher2_round)
+        }
+
+    } else {
+        this.setImageResource(R.mipmap.ic_launcher2_round)
     }
 }
 fun getServerTimeStamp(callback: (Timestamp) -> Unit){

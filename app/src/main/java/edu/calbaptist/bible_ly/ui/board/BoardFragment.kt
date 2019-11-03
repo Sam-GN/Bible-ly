@@ -174,7 +174,7 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
     }
 
     override fun onBoardItemSelected(boardItem: DocumentSnapshot) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     private fun updateUI(crimes: MutableList<BoardRecycleViewItem>) {

@@ -41,6 +41,17 @@
                 android:layout_marginTop="10dp"
                 android:src="@drawable/ic_class_logo_default" />
 
+            <ImageButton
+                android:id="@+id/ib_class_students_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:src="@drawable/ic_more_vert_black_24dp"
+
+                android:visibility="visible"/>
+
 
             <TextView
                 android:gravity="center_horizontal"
