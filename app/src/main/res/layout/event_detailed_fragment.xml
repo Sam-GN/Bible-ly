@@ -8,20 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_margin="10dp">
-
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/et_event_frag_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Title"/>
-
-    </com.google.android.material.textfield.TextInputLayout>
+       android:padding="15dp">
 
 
 
@@ -36,20 +23,46 @@
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/et_event_frag_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@+id/btn_event_frag_date"
+        android:text="Date"
+        android:layout_marginTop="5dp"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_event_frag_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pick date" />
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/et_event_frag_date"
+            android:id="@+id/et_event_frag_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Date"/>
+            android:hint="Description"/>
 
 
 
     </com.google.android.material.textfield.TextInputLayout>
+
 
 
 

@@ -1,35 +1,33 @@
 package edu.calbaptist.bible_ly.ui.board
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
-import edu.calbaptist.bible_ly.BoardRecycleViewItem
-import edu.calbaptist.bible_ly.R
+import edu.calbaptist.bible_ly.*
 import edu.calbaptist.bible_ly.adapter.BoardAdapter
-import edu.calbaptist.bible_ly.ui.EventFragment
-import kotlinx.android.synthetic.main.fragment_board.*
+import edu.calbaptist.bible_ly.adapter.EventMutableListAdapter
 
 
-class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
+class BoardFragment : Fragment(),EventMutableListAdapter.OnEventItemSelectedListener ,BoardAdapter.OnBoardItemSelectedListener{
+    override fun onEventItemSelected(classItem: Event) {
+        var d = EventDialog.newInstance(false, false , classItem.clss!!.classID,classItem.eventID)
+//        d.show(requireFragmentManager(),"")
+
+        val fm = requireActivity().supportFragmentManager
+        d.show(fm,"EventDialog")
+    }
 
     companion object {
 
@@ -60,6 +58,9 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
     private lateinit var notificationRecyclerView: RecyclerView
    // private  var studentAdapter: NotificationAdapter = NotificationAdapter()
    lateinit var adapter: BoardAdapter
+    lateinit var adapter2: EventMutableListAdapter
+    var eventList = mutableListOf<Event>()
+    var doneList = mutableListOf<Boolean>()
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
@@ -68,6 +69,7 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_board, container, false)
 
@@ -86,8 +88,8 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
         firestore = FirebaseFirestore.getInstance()
 
         // Get ${LIMIT} restaurants
-        query = firestore.collection("Event")
-//            .orderBy("startDate", Query.Direction.DESCENDING)
+        query = firestore.collectionGroup("events")
+            .orderBy("createdDate", Query.Direction.DESCENDING)
 //            .limit(LIMIT.toLong())
 
         // RecyclerView
@@ -95,13 +97,50 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
             override fun onDataChanged() {
                 // Show/hide content if the query returns empty.
                 Log.i("BoardFragment",itemCount.toString())
+                eventList =  mutableListOf<Event>()
                 if (itemCount == 0) {
-                   /* recyclerRestaurants.visibility = View.GONE
-                    viewEmpty.visibility = View.VISIBLE*/
-                } /*else {
-                    recyclerRestaurants.visibility = View.VISIBLE
-                    viewEmpty.visibility = View.GONE
-                }*/
+                   reloadEvents()
+                } else {
+                    for(i in 0 until itemCount)
+                    {
+                        doneList.add(false)
+                        val event = getSnapshot(i).toObject(Event::class.java) ?: continue
+                        var classId = event.clss!!.classID
+                        firestore.document("User/"+MainActivity.user.email).collection("classes").get().addOnSuccessListener { classes ->
+                            doneList.remove(false)
+                            classes.forEach { c ->
+                                if(c["classID"].toString() == classId){
+                                    if(!eventList.contains(event))
+                                        eventList.add(event)
+
+
+                                }
+
+                            }
+                            if(doneList.size ==0){
+                                reloadEvents()
+                            }
+                        }
+                        doneList.add(false)
+                        firestore.document(classId).get().addOnSuccessListener {cls ->
+                            doneList.remove(false)
+                            val clss = cls.toObject(Class::class.java) ?: return@addOnSuccessListener
+                            if(clss.teacher!!.email == MainActivity.user.email){
+                                if(!eventList.contains(event))
+                                    eventList.add(event)
+
+                            }
+
+                            if(doneList.size ==0){
+                                reloadEvents()
+                            }
+                        }
+                    }
+
+//                    recyclerRestaurants.visibility = View.VISIBLE
+//                    viewEmpty.visibility = View.GONE
+
+                }
             }
 
             override fun onError(e: FirebaseFirestoreException) {
@@ -110,12 +149,20 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
             }
         }
 
-        notificationRecyclerView.adapter = adapter
+        adapter2= EventMutableListAdapter( this)
+       // notificationRecyclerView.adapter = adapter
       /*  var b: Button =  root.findViewById(R.id.button)
         b.setOnClickListener{
             var aa= firestore.collection("messages").document()
         }*/
         return root
+    }
+
+    fun reloadEvents(){
+        Toast.makeText(requireContext(),eventList.size.toString(),Toast.LENGTH_SHORT).show()
+        adapter2.submitList(eventList)
+        //adapter2.notifyDataSetChanged()
+        notificationRecyclerView.adapter = adapter2
     }
 
 //    override fun onAttach(context: Context) {
@@ -174,7 +221,7 @@ class BoardFragment : Fragment(),BoardAdapter.OnBoardItemSelectedListener {
     }
 
     override fun onBoardItemSelected(boardItem: DocumentSnapshot) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     private fun updateUI(crimes: MutableList<BoardRecycleViewItem>) {

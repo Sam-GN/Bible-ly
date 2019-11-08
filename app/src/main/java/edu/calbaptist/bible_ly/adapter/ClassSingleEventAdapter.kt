@@ -1,15 +1,21 @@
 package edu.calbaptist.bible_ly.adapter
 
+import android.content.DialogInterface
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import edu.calbaptist.bible_ly.Event
-import edu.calbaptist.bible_ly.R
+import edu.calbaptist.bible_ly.*
 import kotlinx.android.synthetic.main.list_class_single_item_event.view.*
 
 
@@ -40,8 +46,8 @@ open class ClassSingleEventAdapter(query: Query, private val listener: OnClassSi
             snapshot: DocumentSnapshot,
             listener: OnClassSingleEventItemSelectedListener?
         ) {
-
             val event = snapshot.toObject(Event::class.java) ?: return
+
 
             val resources = itemView.resources
 
@@ -64,10 +70,57 @@ open class ClassSingleEventAdapter(query: Query, private val listener: OnClassSi
             Log.i("ClassSingleEventAdapter",event.name)
             itemView.tv_class_event_name.text = event.name
             itemView.tv_class_event_description.text = event.description
+            itemView.tv_class_event_date.text = event.date!!.toLocalDateString(true)
             // Click listener
             itemView.setOnClickListener {
                 listener?.onClassSingleEventItemSelected(snapshot)
             }
+            if(event.clss!!.teacher!!.email== MainActivity.user.email){
+                itemView.ib_class_event_options.visibility = View.VISIBLE
+                itemView.ib_class_event_options.setOnClickListener {
+                    showPopup(it,snapshot)
+                }
+            }
+
+        }
+        private fun showPopup(view: View,snapshot: DocumentSnapshot) {
+            var popup: PopupMenu? = null;
+            popup = PopupMenu(view.context, view)
+            popup.inflate(R.menu.menu_events_item_more)
+
+            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+
+                when (item!!.itemId) {
+                    R.id.events_item_action_delete -> {
+
+                        var dialoge = AlertDialog.Builder(view.context)
+                            .setCancelable(false)
+                            .setTitle("Are you sure you want to delete event?")
+                            .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                                //Action goes here
+                            })
+                            .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                                snapshot.reference.delete()
+                                Toast.makeText(view.context,  "Event Deleted", Toast.LENGTH_SHORT).show()
+                               // this.finish()
+                            })
+                            .create()
+
+                        dialoge.show()
+
+                    }
+                   /* R.id.header2 -> {
+                        Toast.makeText(this@MainActivity, item.title, Toast.LENGTH_SHORT).show();
+                    }
+                    R.id.header3 -> {
+                        Toast.makeText(this@MainActivity, item.title, Toast.LENGTH_SHORT).show();
+                    }*/
+                }
+
+                true
+            })
+
+            popup.show()
         }
     }
 }

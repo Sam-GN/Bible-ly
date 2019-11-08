@@ -32,6 +32,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu.OnFloatingActionsMen
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import edu.calbaptist.bible_ly.*
@@ -93,15 +94,17 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
         firestore = FirebaseFirestore.getInstance()
 
         // Get ${LIMIT} restaurants
-        query = firestore.collection("Class")
+
+        //query = firestore.collection("Class").document().collection("students").whereEqualTo("email",MainActivity.user.email)
+        query = firestore.collection("User").document(MainActivity.user.email).collection("classes")//.whereEqualTo("students.email",MainActivity.user.email)
 //            .orderBy("startDate", Query.Direction.DESCENDING)
             //.limit()
-            .whereArrayContains("students",MainActivity.user)
+        //   .whereArrayContains("students",MainActivity.user)
 
         var query2 = firestore.collection("Class")
 //            .orderBy("startDate", Query.Direction.DESCENDING)
             //.limit()
-            .whereEqualTo("teacher",MainActivity.user)
+            .whereEqualTo("teacher.email",MainActivity.user.email)
         // RecyclerView
         root.tv_class_teacherRV_label.visibility = View.GONE
         root.tv_class_studentRV_label.visibility = View.GONE
@@ -175,10 +178,11 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
     override fun onClassItemSelected(classItem: DocumentSnapshot) {
         val intent = Intent(requireContext(), ClassSingleActivity::class.java)
 // To pass any data to next activity
-        intent.putExtra("path", classItem.reference.path)
+        intent.putExtra("path", classItem["classID"].toString())
         intent.putExtra("title", classItem.get("name").toString())
 // start your next activity
         startActivity(intent)
+        activity!!.finish()
     }
 
     override fun onStart() {
@@ -268,15 +272,16 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                                 var classes = document.documents
                                 for (clss in classes) {
                                     var c = clss.toObject(Class::class.java)
+                                    if(c!!.teacher!!.email == MainActivity.user.email){
+                                        Toast.makeText(requireContext(),"You can't join a class you teach",Toast.LENGTH_LONG).show()
+                                        return@getServerTimeStamp
+                                    }
+//                                    c!!.classID = clss.reference.path
                                     for (t in c!!.tokens) {
                                         if (t.id == id.toString()) {
 
                                             if (t.expireDate!!.after(current.toDate())) {
-                                                FirebaseFirestore.getInstance()
-                                                    .document(clss.reference.path).update(
-                                                        "students",
-                                                        FieldValue.arrayUnion(MainActivity.user)
-                                                    )
+
                                                  FirebaseFirestore.getInstance()
                                                     .document(clss.reference.path)
                                                     .collection("students")
@@ -286,15 +291,20 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                                                             FirebaseFirestore.getInstance()
                                                                 .document(clss.reference.path)
                                                                 .collection("students").document().set(MainActivity.user)
+                                                            FirebaseFirestore.getInstance().collection("User")
+                                                                .document(MainActivity.user.email)
+                                                                .collection("classes").document().set(c)
+                                                            FirebaseMessaging.getInstance().subscribeToTopic(c.classID)
                                                         }
                                                         else{
                                                             Toast.makeText(requireContext(),"You are already in this class",Toast.LENGTH_LONG).show()
-                                                            FirebaseFirestore.getInstance()
-                                                                .document(clss.reference.path)
-                                                                .collection("students").document().set(MainActivity.user)
+//                                                            FirebaseFirestore.getInstance()
+//                                                                .document(clss.reference.path)
+//                                                                .collection("students").document().set(MainActivity.user)
                                                         }
 
                                                     }
+
 
 
                                             } else {
@@ -460,27 +470,31 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                     val downloadUri = task.result
                     Toast.makeText(requireContext(), downloadUri.toString(), Toast.LENGTH_SHORT).show()
 
-                    var studentList = ArrayList<User>()
+//                    var studentList = ArrayList<User>()
 //                    studentList.add(MainActivity.user)
 //                    studentList.add(MainActivity.user)
+
+                    val fireStore = FirebaseFirestore.getInstance()
+                    val eventRef = fireStore.collection("Class").document()
+
+
                     var biblelyClass = Class(
-                        "",
+                        eventRef.path,
                         MainActivity.user,
                         dialogView.sw_class_new_autoJoin.isChecked,
                         dialogView.et_class_new_title.text.toString(),
                         dialogView.et_class_new_description.text.toString(),
-                        studentList,
+                        //studentList,
                         downloadUri.toString(),
                         ArrayList<Token>()
                     )
-                    val fireStore = FirebaseFirestore.getInstance()
-                    val eventRef = fireStore.collection("Class").document()
+                    FirebaseMessaging.getInstance().subscribeToTopic(biblelyClass.classID)
                     eventRef.set(biblelyClass)
 
-                    for(a in studentList){
-                        val ref2 = fireStore.document(eventRef.path).collection("students").document()
-                        ref2.set(a)
-                    }
+//                    for(a in studentList){
+//                        val ref2 = fireStore.document(eventRef.path).collection("students").document()
+//                        ref2.set(a)
+//                    }
 
                     //addUploadRecordToDb(downloadUri.toString())
                 } else {
@@ -490,25 +504,27 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
 
             }
         }else{
-            var studentList = ArrayList<User>()
+//            var studentList = ArrayList<User>()
             // studentList.add(MainActivity.user)
+
+            val fireStore = FirebaseFirestore.getInstance()
+            val eventRef = fireStore.collection("Class").document()
             var biblelyClass = Class(
-                "",
+                eventRef.path,
                 MainActivity.user,
                 dialogView.sw_class_new_autoJoin.isChecked,
                 dialogView.et_class_new_title.text.toString(),
                 dialogView.et_class_new_description.text.toString(),
-                studentList,
+//                studentList,
                 "",
                ArrayList<Token>()
             )
-            val fireStore = FirebaseFirestore.getInstance()
-            val eventRef = fireStore.collection("Class").document()
+            FirebaseMessaging.getInstance().subscribeToTopic(biblelyClass.classID)
             eventRef.set(biblelyClass)
-            for(a in studentList){
-                val ref2 = fireStore.document(eventRef.path).collection("students").document()
-                ref2.set(a)
-            }
+//            for(a in studentList){
+//                val ref2 = fireStore.document(eventRef.path).collection("students").document()
+//                ref2.set(a)
+//            }
         }
 
 

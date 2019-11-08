@@ -5,25 +5,35 @@ import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
-data class Token(
 
-    var expireDate: Date? = null,
+
+
+
+data class Token (
+    var expireDate: Date?,
     var id:String,
-    var user:User? = null
-){
+    var user:User?)
+
+
+    /*var expireDate: Date? = null,
+    var id:String,
+    var user:User? = null*/
+
+{
     constructor() : this( null,"",null)
 }
-data class Class(
-    val classID: String,
+
+data class Class (
+    var classID: String,
     var teacher: User?,
     var isPublic: Boolean,
     var name: String,
     var description: String,
-    var students: ArrayList<User>,
+    //var students: ArrayList<User>,
     var classLogo: String,
     var tokens: ArrayList<Token>
 ){
-    constructor() : this( "",null,true, "","",ArrayList<User>(),"", ArrayList<Token>())
+    constructor() : this( "",null,true, "","","", ArrayList<Token>())
 }
 //class dont need event because in database multiple events
 //will have the same class as classID
@@ -72,13 +82,17 @@ data class Question(
 )
 
 data class Event(
+    var eventID:String,
     var name: String = "name",
 //    var repeat: Int = 0,
-    var date: String ="",
+    var date: Date? =null,
 //    var endDate: Date? = null,
     var description: String = "Event desc",
-    val clss: Class? = null
-)
+    val clss: Class? = null,
+    var createdDate: Date? = null
+){
+    constructor() : this( "","",null, "",null,null)
+}
 
 data class ClassMember(
     val memberID: Int,
