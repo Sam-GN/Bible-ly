@@ -42,6 +42,7 @@ private var iAmTeacher: Boolean = false
 private lateinit var mmenu: Menu
 
 
+
 class ClassSingleActivity : AppCompatActivity()
     , StudentAdapter.OnStudentItemSelectedListener
     , StudentAdapter.OnMoreItemSelectedListener
@@ -74,10 +75,15 @@ class ClassSingleActivity : AppCompatActivity()
                             val biblelyStudent = snapshot.toObject(User::class.java)
 
                             FirebaseFirestore.getInstance()
-                                .document(path).update(
+                                .collection("User").document(biblelyStudent!!.email).collection("classes")
+                                .whereEqualTo("classID",path).get().addOnSuccessListener {document ->
+                                    document?.forEach { d->d.reference.delete() }
+
+                                }
+                                /*.document(path).update(
                                     "students",
                                     FieldValue.arrayRemove(biblelyStudent)
-                                )
+                                )*/
                             FirebaseFirestore.getInstance().document(path).collection("students")
                                 .whereEqualTo("email", biblelyStudent?.email).get()
                                 .addOnSuccessListener { document ->
@@ -91,6 +97,46 @@ class ClassSingleActivity : AppCompatActivity()
 
                     dialoge.show()
 
+                }
+                R.id.students_item_action_promote->{
+                    var dialoge = AlertDialog.Builder(view.context)
+                        .setCancelable(false)
+                        .setTitle("Are you sure you want to promote this student to teacher?\nYou will be removed from the class")
+                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                            //Action goes here
+                        })
+                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                            //snapshot.reference.delete()
+                            //FirebaseFirestore.getInstance().document(path).
+                            val biblelyStudent = snapshot.toObject(User::class.java)
+
+
+
+                            FirebaseFirestore.getInstance().document(path).update("teacher",biblelyStudent)
+                            FirebaseFirestore.getInstance().document(path).collection("events")
+                                .get().addOnSuccessListener {documents ->
+                                documents.forEach { d-> FirebaseFirestore.getInstance().document(d.reference.path)
+                                    .update("clss.teacher",biblelyStudent) }
+                            }
+                            FirebaseFirestore.getInstance().document(path).collection("students").whereEqualTo("email",biblelyStudent!!.email)
+                                .get().addOnSuccessListener {documents ->
+                                    documents.forEach { d->
+                                        FirebaseFirestore.getInstance().document(d.reference.path)
+                                        .delete()}
+                                }
+                            FirebaseFirestore.getInstance().collection("User").document(biblelyStudent.email).collection("classes").whereEqualTo("classID",path)
+                                .get().addOnSuccessListener {documents ->
+                                    documents.forEach { d->
+                                        FirebaseFirestore.getInstance().document(d.reference.path)
+                                            .delete()}
+                                }
+
+                            Toast.makeText(view.context,  "Student Promoted", Toast.LENGTH_SHORT).show()
+                             this.finish()
+                        })
+                        .create()
+
+                    dialoge.show()
                 }
                 /* R.id.header2 -> {
                      Toast.makeText(this@MainActivity, item.title, Toast.LENGTH_SHORT).show();
@@ -128,6 +174,10 @@ class ClassSingleActivity : AppCompatActivity()
         setSupportActionBar(toolbar)
         var bundle: Bundle? = intent.extras
 
+
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar!!.setDisplayShowHomeEnabled(true)
+
         path = bundle!!.getString("path")
         var title = bundle.getString("title")
         FirebaseFirestore.getInstance().document(path!!).get()
@@ -137,24 +187,30 @@ class ClassSingleActivity : AppCompatActivity()
                     // mySupportActionBar.title = classs!!.name
                     tv_class_single_teacher.text = classs!!.teacher!!.userName
                     tv_class_single_description.text = classs!!.description
-                    sw_class_single_auto_join.isChecked = classs!!.isPublic
+                    iv_class_single_teacher.setGlide(classs!!.teacher!!.photoID)
+                    //sw_class_single_auto_join.isChecked = classs!!.isPublic
                     if(classs!!.teacher!!.email==MainActivity.user.email){
                         iAmTeacher = true
-//                        if(mmenu!=null)
-//                            mmenu.removeItem(R.id.action_leave)
+                       if(mmenu!=null)
+                           mmenu.removeItem(R.id.action_leave)
                     } else {
                         btn_class_single_new_event.visibility = View.GONE
+                        iAmTeacher = false
                     }
                     classTokens = classs!!.tokens
 
 
-                    var q=FirebaseFirestore.getInstance().collection("Event").whereEqualTo("clss", classs)
+                    var q=FirebaseFirestore.getInstance().document(path).collection("events")
+                        .orderBy("createdDate", Query.Direction.DESCENDING)
                     eventAdapter = object : ClassSingleEventAdapter(q, this@ClassSingleActivity) {
                         override fun onDataChanged() {
                             // Show/hide content if the query returns empty.
                             Log.i("ClassFragment student", itemCount.toString())
 
-                            tv_class_single_no_events.visibility = View.INVISIBLE
+                            if(itemCount !=0)
+                                tv_class_single_no_events.visibility = View.INVISIBLE
+                            else
+                                tv_class_single_no_events.visibility = View.VISIBLE
                         }
 
                         override fun onError(e: FirebaseFirestoreException) {
@@ -175,6 +231,15 @@ class ClassSingleActivity : AppCompatActivity()
                 //  Log.d(TAG, "get failed with ", exception)
             }
 
+        iv_class_single_teacher.setOnClickListener {
+
+            var d = StudentDialog.newInstance("User/"+ classs!!.teacher!!.email)
+//        d.show(requireFragmentManager(),"")
+
+            val fm = supportFragmentManager
+            d.show(fm,"StudentDialog")
+        }
+
         fab.setOnClickListener { view ->
 
 
@@ -184,10 +249,10 @@ class ClassSingleActivity : AppCompatActivity()
                     if (t.user!!.email == MainActivity.user.email && t.expireDate!!.after(a.toDate())) {
                         Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, "Bible-ly//:" + t.id)
+                            putExtra(Intent.EXTRA_TEXT, "" + t.id)
                             putExtra(Intent.EXTRA_SUBJECT, "Join Bible-ly Class")
                         }.also { intent ->
-                            val chooserIntent = Intent.createChooser(intent, "Bible-ly//:" + t.id)
+                            val chooserIntent = Intent.createChooser(intent, "" + t.id)
                             startActivity(chooserIntent)
                         }
                         return@getServerTimeStamp
@@ -203,10 +268,10 @@ class ClassSingleActivity : AppCompatActivity()
                     .update("tokens", FieldValue.arrayUnion(t))
                 Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, "Bible-ly//:" + t.id)
+                    putExtra(Intent.EXTRA_TEXT, "" + t.id)
                     putExtra(Intent.EXTRA_SUBJECT, "Join Bible-ly Class")
                 }.also { intent ->
-                    val chooserIntent = Intent.createChooser(intent, "Bible-ly//:" + t.id)
+                    val chooserIntent = Intent.createChooser(intent, "" + t.id)
                     startActivity(chooserIntent)
                 }
             }
@@ -278,58 +343,7 @@ class ClassSingleActivity : AppCompatActivity()
 
 
         btn_class_single_new_event.setOnClickListener {
-           /* val view = layoutInflater.inflate(R.layout.event_detailed_fragment, null)
-            view.tf_event_frag_className.editText!!.setText(classs!!.name)
-            view.tf_event_frag_className.isEnabled = false
-            view.btn_event_frag_date.setOnClickListener {
-                var datePicker = DatePicker(this)
 
-                var dialoge2 = AlertDialog.Builder(this)
-                    .setTitle("Pick Date")
-                    .setCancelable(false)
-                    .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
-                        //Action goes here
-                    })
-                    .setPositiveButton("Select", DialogInterface.OnClickListener { dialog, which ->
-                        //view.btn_event_frag_date.tag = datePicker.getCalendarFromDatePicker()
-                        getTime(view.btn_event_frag_date,this,datePicker.getCalendarFromDatePicker())
-
-                    })
-                    .setView(datePicker).create()
-
-                dialoge2.show()
-            }
-
-
-            var dialoge = AlertDialog.Builder(this)
-                .setTitle("New Event")
-
-                .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
-                    //Action goes here
-                })
-                .setPositiveButton("Create", DialogInterface.OnClickListener { dialog, which ->
-
-                })
-                .setCancelable(false)
-                .setView(view).create()
-
-            dialoge.show()
-            (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                if(view.et_event_frag_title.text.toString().isEmpty()){
-                    Toast.makeText(this,"Title is required.",Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                if(view.btn_event_frag_date.tag==null){
-                    Toast.makeText(this,"Date is required.",Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                var ev = Event(view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time
-                    ,view.et_event_frag_description.text.toString()
-                    ,classs)
-                var ref = FirebaseFirestore.getInstance().collection("Event").document()
-                ref.set(ev)
-                dialoge.dismiss()
-            }*/
             var d = EventDialog.newInstance(true,iAmTeacher, path,"")
 //        d.show(requireFragmentManager(),"")
 
@@ -378,6 +392,14 @@ class ClassSingleActivity : AppCompatActivity()
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item!!.itemId) {
+
+
+            android.R.id.home ->{
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("currentDestination", R.id.classes)
+                startActivity(intent)
+                this.finish()
+            }
             R.id.action_leave -> {
 
                 var dialoge = AlertDialog.Builder(this)
@@ -387,11 +409,17 @@ class ClassSingleActivity : AppCompatActivity()
                         //Action goes here
                     })
                     .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+//                        FirebaseFirestore.getInstance()
+//                            .document(path).update(
+//                                "students",
+//                                FieldValue.arrayRemove(MainActivity.user)
+//                            )
                         FirebaseFirestore.getInstance()
-                            .document(path).update(
-                                "students",
-                                FieldValue.arrayRemove(MainActivity.user)
-                            )
+                            .collection("User").document(MainActivity.user.email).collection("classes")
+                            .whereEqualTo("classID",path).get().addOnSuccessListener {document ->
+                                document?.forEach { d->d.reference.delete() }
+
+                            }
                         FirebaseFirestore.getInstance().document(path).collection("students")
                             .whereEqualTo("email", MainActivity.user.email).get()
                             .addOnSuccessListener { document ->
@@ -409,10 +437,13 @@ class ClassSingleActivity : AppCompatActivity()
         return super.onOptionsItemSelected(item)
     }
 
-    /* override fun onBackPressed() {
 
-         this.finish()
-            // super.onBackPressed()
+
+     /*override fun onBackPressed() {
+
+         //this.finish()
+            super.onBackPressed()
+        Toast.makeText(this,"haha",Toast.LENGTH_LONG).show()
 
      }*/
 

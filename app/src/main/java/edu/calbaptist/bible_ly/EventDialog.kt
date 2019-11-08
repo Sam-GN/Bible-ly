@@ -50,7 +50,7 @@ class EventDialog: DialogFragment() {
             myView.btn_event_frag_date.text =( event.date?.toLocalDateString(true))
             myView.btn_event_frag_date.tag = Calendar.getInstance().apply { time= event.date}
             myView.et_event_frag_description.setText(event.description)
-            if(clss.teacher!!.email != MainActivity.user.email){
+            if(!isTeacher!!){
                 myView.et_event_frag_title.isFocusable = false
                 myView.btn_event_frag_date.isClickable = false
                 myView.et_event_frag_description.isFocusable = false
@@ -108,14 +108,20 @@ class EventDialog: DialogFragment() {
                 Toast.makeText(requireContext(),"Date is required.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            var ev = Event(view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time
-                ,view.et_event_frag_description.text.toString()
-                ,clss)
+
             if(isNew!!) {
-                var ref = FirebaseFirestore.getInstance().collection("Event").document()
+                var ref = FirebaseFirestore.getInstance().document(classPath!!).collection("events").document()
+               // var ref = FirebaseFirestore.getInstance().collection("Event").document()
+                var ev = Event(ref.path,view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time
+                    ,view.et_event_frag_description.text.toString()
+                    ,clss,Date())
+
                 ref.set(ev)
             }else{
                 var ref = FirebaseFirestore.getInstance().document(eventPath!!)
+                var ev = Event(ref.path,view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time
+                    ,view.et_event_frag_description.text.toString()
+                    ,clss)
                 ref.set(ev)
             }
             dialoge.dismiss()

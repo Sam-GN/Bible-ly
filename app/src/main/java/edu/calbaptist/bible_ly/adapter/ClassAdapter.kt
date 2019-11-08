@@ -41,7 +41,11 @@ open class ClassAdapter (query: Query, private val listener: OnClassItemSelected
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getSnapshot(position), listener)
+       /* getSnapshot(position).reference.collection("students").whereEqualTo("email",MainActivity.user.email).get().addOnSuccessListener {
+            if(!it.isEmpty)
+
+        }
+*/      holder.bind(getSnapshot(position), listener)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -50,7 +54,9 @@ open class ClassAdapter (query: Query, private val listener: OnClassItemSelected
             snapshot: DocumentSnapshot,
             listener: OnClassItemSelectedListener?
         ) {
-
+          /*  if(!snapshot.reference.collection("students").whereEqualTo("email",MainActivity.user.email).get().isSuccessful) {
+                return
+            }*/
             val biblelyClass = snapshot.toObject(Class::class.java) ?: return
 
             val resources = itemView.resources

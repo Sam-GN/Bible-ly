@@ -46,8 +46,7 @@ class StudentDialog: DialogFragment() {
         myView.iv_student_frag_logo.setGlide(student!!.photoID)
         myView.ib_student_frag_email.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = Uri.parse("mailto:") // only email apps should handle this
-            intent.putExtra(Intent.EXTRA_EMAIL, student!!.email)
+            intent.data = Uri.parse("mailto:"+student!!.email) // only email apps should handle this
             intent.putExtra(Intent.EXTRA_SUBJECT,"")
             if (intent.resolveActivity(activity!!.packageManager) != null) {
                 startActivity(intent)

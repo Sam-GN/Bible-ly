@@ -7,36 +7,47 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ClassSingleActivity"
     tools:showIn="@layout/activity_class_single"
-    android:layout_marginStart="5dp"
-    android:layout_marginEnd="5dp">
+    android:padding="10dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
 
-    <TextView
-        android:id="@+id/tv_class_single_teacher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Teacher"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        <ImageView
+            android:id="@+id/iv_class_single_teacher"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
 
-        <Switch
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/tv_class_single_teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:text="Teacher"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_class_single_teacher"
+            android:gravity="center_vertical"/>
+
+     <!--   <Switch
             android:id="@+id/sw_class_single_auto_join"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Auto join"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_class_single_teacher" />
+            app:layout_constraintTop_toBottomOf="@id/tv_class_single_teacher" />-->
 
         <TextView
         android:id="@+id/tv_class_single_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="description"
-        app:layout_constraintTop_toBottomOf="@id/sw_class_single_auto_join"
+        app:layout_constraintTop_toBottomOf="@id/iv_class_single_teacher"
         app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
