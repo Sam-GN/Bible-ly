@@ -49,9 +49,7 @@ import java.util.*
 private const val TAG = "UserFireStore"
 private var currentDestination = R.id.nav_board
 
-private val FCM_API = "https://fcm.googleapis.com/fcm/send"
-private val serverKey = "key=" + "AAAA_Z8c2FM:APA91bFTvaDRR7T0VmD2NVKvmkUfWF5yU3ZFDsXsVUZnYD7wvHSk1rV3iU82kDd625Q5PKZDgYCWXpdsLN0tRkZePw00iu7ToIpD2Ixh5xYS6ku4uWSVqBhQ4H-lNURQZ-xSB9mz5vnK"
-private val contentType = "application/json"
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -101,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             val personName = acct.displayName
             val personGivenName = acct.givenName
             val personFamilyName = acct.familyName
-            val personEmail = acct.email
+            val personEmail = acct.email//+"1111"
             val personId = acct.id
             val personPhoto = acct.photoUrl
 
@@ -165,92 +163,14 @@ class MainActivity : AppCompatActivity() {
 
             R.id.action_settings -> {
 
-                var TOPIC = "/topics/Events"; //topic must match with what the receiver subscribed to
-                var NOTIFICATION_TITLE = "test from client"
-                var NOTIFICATION_MESSAGE = "test from client mmm"
 
-                var notification =  JSONObject()
-                var notifcationBody =  JSONObject()
-                try {
-                    notifcationBody.put("title", NOTIFICATION_TITLE);
-                    notifcationBody.put("message", NOTIFICATION_MESSAGE);
+                sendNotification("GmAqO3qU2MWHfnidJRcO","hi","Hello",this)
 
-                    notification.put("to", TOPIC);
-                    notification.put("data", notifcationBody);
-                } catch (e: JSONException) {
-                    Log.e(TAG, "onCreate: " + e.message );
-                }
-                sendNotification(notification);
-                /*val TAG = "JSA-FCM"
-                val SENDER_ID = "xxxxxxxxxxxx"
-                val random = Random()
-                val fm = FirebaseMessaging.getInstance()
-
-                val message = RemoteMessage.Builder(SENDER_ID + "@gcm.googleapis.com")
-                    .setMessageId(Integer.toString(random.nextInt(9999)))
-                    .addData(edt_key1.text.toString(), edt_value1.text.toString())
-                    .addData(edt_key2.text.toString(), edt_value2.text.toString())
-                    .build()
-
-                if (!message.data.isEmpty()) {
-                    Log.e(TAG, "UpstreamData: " + message.data)
-                }
-
-                if (!message.messageId.isEmpty()) {
-                    Log.e(TAG, "UpstreamMessageId: " + message.messageId)
-                }
-
-                fm.send(message)*/
 
             }
 
         }
         return super.onOptionsItemSelected(item)
-    }
-    private fun sendNotification(notification:JSONObject ) {
-        var jsonObjectRequest  = object: JsonObjectRequest(
-            Request.Method.POST, FCM_API, null,
-            Response.Listener<JSONObject> { response ->
-                Log.i(TAG, "onResponse: $response")
-            },
-            Response.ErrorListener {
-                Toast.makeText(this, "That didn't work!", Toast.LENGTH_SHORT).show()
-            })
-        {
-            override fun getHeaders(): MutableMap<String, String> {
-
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = serverKey
-                headers["Content-Type"] = contentType
-                return headers
-            }
-        }
-       // var jsonObjectRequest =  JsonObjectRequest("",notification,null,null)
-       /* var jsonObjectRequest =  JsonObjectRequest("FCM_API", notification,
-             Response.Listener<JSONObject>() {
-                @Override
-                void onResponse(JSONObject response) {
-                    Log.i(TAG, "onResponse: " + response.toString());
-                    edtTitle.setText("");
-                    edtMessage.setText("");
-                }
-            },
-            Response.ErrorListener() {
-                @Override
-                void onErrorResponse(VolleyError error) {
-                    Toast.makeText(MainActivity.this, "Request error", Toast.LENGTH_LONG).show();
-                    Log.i(TAG, "onErrorResponse: Didn't work");
-                }
-            }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-            Map<String, String> params = new HashMap<>();
-            params.put("Authorization", serverKey);
-            params.put("Content-Type", contentType);
-            return params;
-        }
-        };*/
-        VolleySingleton.requestQueque.add(jsonObjectRequest)
     }
 
     override fun onSupportNavigateUp(): Boolean {

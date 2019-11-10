@@ -90,6 +90,7 @@ class ClassSingleActivity : AppCompatActivity()
                                     document?.forEach { d -> d.reference.delete() }
 
                                 }
+
                             Toast.makeText(view.context,  "Student Removed", Toast.LENGTH_SHORT).show()
                             // this.finish()
                         })
@@ -132,7 +133,10 @@ class ClassSingleActivity : AppCompatActivity()
                                 }
 
                             Toast.makeText(view.context,  "Student Promoted", Toast.LENGTH_SHORT).show()
-                             this.finish()
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra("currentDestination", R.id.classes)
+                            startActivity(intent)
+                            this.finish()
                         })
                         .create()
 
@@ -439,13 +443,14 @@ class ClassSingleActivity : AppCompatActivity()
 
 
 
-     /*override fun onBackPressed() {
+     override fun onBackPressed() {
 
-         //this.finish()
-            super.onBackPressed()
-        Toast.makeText(this,"haha",Toast.LENGTH_LONG).show()
+         val intent = Intent(this, MainActivity::class.java)
+         intent.putExtra("currentDestination", R.id.classes)
+         startActivity(intent)
+         this.finish()
 
-     }*/
+     }
 
     companion object{
         var classs: Class? = null

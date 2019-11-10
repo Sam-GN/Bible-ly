@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Point
 import android.util.Log
 import android.widget.*
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,6 +17,8 @@ import kotlinx.android.synthetic.main.content_class_single.*
 import java.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
 
@@ -212,4 +216,69 @@ fun getTime(btn: Button, context: Context,cal: Calendar){
     TimePickerDialog(context, timeSetListener, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
 
 
+}
+fun sendNotification(topic:String,title:String,message:String,context: Context ) {
+    val TAG = "sendNotification"
+    val FCM_API = "https://fcm.googleapis.com/fcm/send"
+    val serverKey = "key=" + "AAAA_Z8c2FM:APA91bFTvaDRR7T0VmD2NVKvmkUfWF5yU3ZFDsXsVUZnYD7wvHSk1rV3iU82kDd625Q5PKZDgYCWXpdsLN0tRkZePw00iu7ToIpD2Ixh5xYS6ku4uWSVqBhQ4H-lNURQZ-xSB9mz5vnK"
+    val contentType = "application/json"
+    var TOPIC = "/topics/$topic" //topic must match with what the receiver subscribed to
+//        var NOTIFICATION_TITLE = "test from client"
+//        var NOTIFICATION_MESSAGE = "test from client mmm"
+
+    var notification =  JSONObject()
+    var notifcationBody =  JSONObject()
+    try {
+        notifcationBody.put("title", title)
+        notifcationBody.put("message", message)
+        notifcationBody.put("topic", topic)
+
+        notification.put("to", TOPIC)
+        notification.put("data", notifcationBody)
+    } catch (e: JSONException) {
+        Log.e(TAG, "onCreate: " + e.message )
+    }
+    var jsonObjectRequest  = object: JsonObjectRequest(
+        Method.POST, FCM_API, notification,
+        Response.Listener<JSONObject> { response ->
+            Log.i(TAG, "onResponse: $response")
+        },
+        Response.ErrorListener {
+            Toast.makeText(context, "That didn't work!", Toast.LENGTH_SHORT).show()
+        })
+    {
+        override fun getHeaders(): MutableMap<String, String> {
+
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = serverKey
+            headers["Content-Type"] = contentType
+            return headers
+        }
+    }
+    // var jsonObjectRequest =  JsonObjectRequest("",notification,null,null)
+    /* var jsonObjectRequest =  JsonObjectRequest("FCM_API", notification,
+          Response.Listener<JSONObject>() {
+             @Override
+             void onResponse(JSONObject response) {
+                 Log.i(TAG, "onResponse: " + response.toString());
+                 edtTitle.setText("");
+                 edtMessage.setText("");
+             }
+         },
+         Response.ErrorListener() {
+             @Override
+             void onErrorResponse(VolleyError error) {
+                 Toast.makeText(MainActivity.this, "Request error", Toast.LENGTH_LONG).show();
+                 Log.i(TAG, "onErrorResponse: Didn't work");
+             }
+         }){
+         @Override
+         public Map<String, String> getHeaders() throws AuthFailureError {
+         Map<String, String> params = new HashMap<>();
+         params.put("Authorization", serverKey);
+         params.put("Content-Type", contentType);
+         return params;
+     }
+     };*/
+    VolleySingleton.requestQueque.add(jsonObjectRequest)
 }
