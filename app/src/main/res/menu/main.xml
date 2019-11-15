@@ -5,5 +5,12 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="always"
+        android:icon="@drawable/ic_question_answer_black_24dp"/>
+    <item
+        android:id="@+id/action_notes"
+        android:orderInCategory="200"
+        android:title="notes"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_note_black_24dp"/>
 </menu>

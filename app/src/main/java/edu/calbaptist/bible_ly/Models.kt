@@ -39,12 +39,18 @@ data class Class (
 //will have the same class as classID
 
 data class Verse(
-    val verseID: Int,
+    val id: String,
     val chapter: String,
-    val verseNum: Int,
-    val verseText: String,
+    val verse: String,
+    val text: String,
     val book: String
-)
+
+) {
+    constructor() : this( "","","", "","")
+    fun getVerseAsInt():Int{
+        return verse.toInt()
+    }
+}
 
 data class User(
    // val userID: Int,
@@ -56,14 +62,28 @@ data class User(
 ) {
     constructor() : this( "","","", "","")
 }
-
+data class Response(
+    var user:User?,
+    var text:String,
+    var date:Date?
+){
+    constructor() : this( null, "",null)
+}
 data class Note(
-    val noteID: Int,
-    val user: User,
-    val verse: Verse,
+    var noteID: String,
+    val user: User?,
+    val book: String,
+    val verseNum: String,
+    val verseChapter: String,
+    val verseText: String,
     var noteText: String,
-    val className: Class
-)
+    var noteTitle: String,
+    var response:ArrayList<Response>,
+    var type:String,
+    var clss:String
+){
+    constructor() : this( "",null,"","","","", "","",ArrayList<Response>(),"","")
+}
 
 data class Flag(
     val flagID: Int,

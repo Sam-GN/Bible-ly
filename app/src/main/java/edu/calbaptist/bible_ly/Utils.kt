@@ -74,6 +74,13 @@ fun getEvent(path:String,callback: (Event) -> Unit){
         }
     }
 }
+fun getVerse(path:String,callback: (Verse) -> Unit){
+    FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
+        if (it != null) {
+            callback( it.toObject(Verse::class.java) as Verse)
+        }
+    }
+}
 fun ImageButton.setGlide(imagePath: String){
     if(imagePath!= "") {
         try {

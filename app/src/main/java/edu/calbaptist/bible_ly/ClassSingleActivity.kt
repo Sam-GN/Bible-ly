@@ -39,7 +39,7 @@ private lateinit var classTokens: ArrayList<Token>
 
 private lateinit var path: String
 private var iAmTeacher: Boolean = false
-private lateinit var mmenu: Menu
+private var mmenu: Menu? = null
 
 
 
@@ -196,7 +196,7 @@ class ClassSingleActivity : AppCompatActivity()
                     if(classs!!.teacher!!.email==MainActivity.user.email){
                         iAmTeacher = true
                        if(mmenu!=null)
-                           mmenu.removeItem(R.id.action_leave)
+                           mmenu!!.removeItem(R.id.action_leave)
                     } else {
                         btn_class_single_new_event.visibility = View.GONE
                         iAmTeacher = false
@@ -390,7 +390,8 @@ class ClassSingleActivity : AppCompatActivity()
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_class_single, menu)
         mmenu=menu
-
+        if(iAmTeacher)
+            mmenu!!.removeItem(R.id.action_leave)
         return true
     }
 

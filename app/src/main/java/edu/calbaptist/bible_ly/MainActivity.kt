@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,11 +18,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -41,8 +44,10 @@ import com.android.volley.Request
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 
@@ -59,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvNavName: TextView
     private lateinit var tvNavEmail: TextView
     private lateinit var ivNav: ImageView
+    private lateinit var navView: NavigationView
 
 
 
@@ -75,6 +81,11 @@ class MainActivity : AppCompatActivity() {
 
         currentDestination = bundle?.getInt("currentDestination") ?: R.id.nav_board
 
+        var db = FirebaseFirestore.getInstance()
+        val settings = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(true)
+            .build()
+        db.firestoreSettings = settings
 
 
 //        FirebaseInstanceId.getInstance().instanceId
@@ -115,9 +126,9 @@ class MainActivity : AppCompatActivity() {
 
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        navView  = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-        if(bundle != null)
+        //if(bundle != null)
              navController.navigate(currentDestination)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -151,9 +162,14 @@ class MainActivity : AppCompatActivity() {
             .into(ivNav)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+   override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
+       mainMenu = menu
+       menu.getItem(0).isVisible = false
+       menu.getItem(1).isVisible = false
+    /*    if (currentDestination ==  R.id.nav_bible)
+            menu.removeItem(R.id.action_settings)*/
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -161,10 +177,52 @@ class MainActivity : AppCompatActivity() {
 
 
 
+                  /*  android.R.id.home->{
+                if(drawer_layout.isDrawerOpen(Gravity.END)) {
+                  //  drawer_layout.closeDrawer(Gravity.LEFT);
+                    Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
+                }
+                else {
+                    drawer_layout.openDrawer(Gravity.END);
+                    Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
+                }
+            }*/
             R.id.action_settings -> {
 
+                ll_bible_nav_notes.visibility = View.GONE
+                ll_bible_nav_chat.visibility = View.VISIBLE
 
-                sendNotification("GmAqO3qU2MWHfnidJRcO","hi","Hello",this)
+
+               // sendNotification("PEeMGAkbsMXXXbDz7lfE","hi","Hello",this)
+
+                    if(drawer_layout.isDrawerOpen(Gravity.END)) {
+                        //  drawer_layout.closeDrawer(Gravity.LEFT);
+                      //  Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        drawer_layout.openDrawer(Gravity.END);
+                        //Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
+                    }
+
+
+            }
+
+            R.id.action_notes -> {
+
+                ll_bible_nav_chat.visibility = View.GONE
+                ll_bible_nav_notes.visibility = View.VISIBLE
+
+
+                // sendNotification("PEeMGAkbsMXXXbDz7lfE","hi","Hello",this)
+
+                if(drawer_layout.isDrawerOpen(Gravity.END)) {
+                    //  drawer_layout.closeDrawer(Gravity.LEFT);
+                    //Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
+                }
+                else {
+                    drawer_layout.openDrawer(Gravity.END);
+                   // Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
+                }
 
 
             }
@@ -180,7 +238,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun signOut() {
         startActivity(SignInActivity.getLaunchIntent(this))
-        FirebaseAuth.getInstance().signOut();
+        FirebaseAuth.getInstance().signOut()
     }
 
     companion object {
@@ -188,6 +246,7 @@ class MainActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         lateinit var user:User
+        lateinit var mainMenu: Menu
 
     }
 
