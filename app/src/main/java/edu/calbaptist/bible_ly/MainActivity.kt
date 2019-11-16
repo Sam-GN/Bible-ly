@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -125,8 +126,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        drawerLayout  = findViewById(R.id.drawer_layout)
         navView  = findViewById(R.id.nav_view)
+        navView2  = findViewById(R.id.nav_view2)
         val navController = findNavController(R.id.nav_host_fragment)
         //if(bundle != null)
              navController.navigate(currentDestination)
@@ -197,7 +199,7 @@ class MainActivity : AppCompatActivity() {
 
                     if(drawer_layout.isDrawerOpen(Gravity.END)) {
                         //  drawer_layout.closeDrawer(Gravity.LEFT);
-                      //  Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
+
                     }
                     else {
                         drawer_layout.openDrawer(Gravity.END);
@@ -247,6 +249,8 @@ class MainActivity : AppCompatActivity() {
         }
         lateinit var user:User
         lateinit var mainMenu: Menu
+        lateinit var navView2: NavigationView
+        lateinit var drawerLayout: DrawerLayout
 
     }
 

@@ -2,7 +2,6 @@
 <resources>
     <string-array name="noteType">
         <item>For Self</item>
-        <item>For Teacher</item>
         <item>For Class</item>
     </string-array>
 

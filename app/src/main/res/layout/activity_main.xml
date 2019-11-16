@@ -42,7 +42,7 @@
             android:orientation="vertical"
             android:layout_marginTop="20dp"
             android:id="@+id/ll_bible_nav_chat"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
 
@@ -52,7 +52,8 @@
                 android:nestedScrollingEnabled="true"
                 app:layout_constraintBottom_toTopOf="@+id/tf_bible_nav_message"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent"
+               />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tf_bible_nav_message"
@@ -87,21 +88,15 @@
             android:orientation="vertical"
             android:layout_marginTop="20dp"
             android:id="@+id/ll_bible_nav_notes"
-            android:visibility="gone">
+            android:visibility="visible">
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="6"
-                android:text="Notes" />
+
 
             <androidx.recyclerview.widget.RecyclerView
 
                 android:id="@+id/rv_bible_nav_notes"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="6"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="true"
                 />
 

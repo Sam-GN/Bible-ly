@@ -71,6 +71,7 @@ data class Response(
 }
 data class Note(
     var noteID: String,
+    var date: Date?,
     val user: User?,
     val book: String,
     val verseNum: String,
@@ -82,7 +83,24 @@ data class Note(
     var type:String,
     var clss:String
 ){
-    constructor() : this( "",null,"","","","", "","",ArrayList<Response>(),"","")
+    constructor() : this( "",null,null,"","","","", "","",ArrayList<Response>(),"","")
+}
+data class NoteCardViewItem(
+    var isHeader:Boolean,
+    var noteID: String,
+    var date: Date?,
+    val user: User?,
+    val book: String,
+    val verseNum: String,
+    val verseChapter: String,
+    val verseText: String,
+    var noteText: String,
+    var noteTitle: String,
+    var response:ArrayList<Response>,
+    var type:String,
+    var clss:String
+){
+    constructor() : this( false,"",null,null,"","","","", "","",ArrayList<Response>(),"","")
 }
 
 data class Flag(

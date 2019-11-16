@@ -3,15 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="edu.calbaptist.bible_ly.ClassSingleActivity">
     <item
-        android:id="@+id/bible_verse_add_note"
+        android:id="@+id/bible_note_go_verse"
         android:orderInCategory="100"
-        android:title="Add Note"
+        android:title="Go to Verse"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/bible_note_edit_note"
+        android:orderInCategory="200"
+        android:title="Edit Note"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/bible_verse_share"
-        android:orderInCategory="200"
-        android:title="Share"
+        android:id="@+id/bible_note_delete_note"
+        android:orderInCategory="300"
+        android:title="Delete Note"
         app:showAsAction="never" />
 
 </menu>

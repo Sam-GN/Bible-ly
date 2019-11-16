@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.QuerySnapshot
 import edu.calbaptist.bible_ly.FirestoreRepository
+import edu.calbaptist.bible_ly.MainActivity
+import edu.calbaptist.bible_ly.NoteCardViewItem
 import edu.calbaptist.bible_ly.Verse
 
 class BibleViewModel : ViewModel() {
@@ -18,6 +20,7 @@ class BibleViewModel : ViewModel() {
 val TAG = "FIRESTORE_VIEW_MODEL"
     var firebaseRepository = FirestoreRepository()
     var verses : MutableLiveData<List<Verse>> = MutableLiveData()
+    var notes : MutableLiveData<List<NoteCardViewItem>> = MutableLiveData()
     // get realtime updates from firebase regarding saved addresses
 
 
@@ -29,14 +32,55 @@ val TAG = "FIRESTORE_VIEW_MODEL"
                 return@EventListener
             }
 
-            var savedAddressList : MutableList<Verse> = mutableListOf()
+            var list : MutableList<Verse> = mutableListOf()
             for (doc in value!!) {
-                var addressItem = doc.toObject(Verse::class.java)
-                savedAddressList.add(addressItem)
+                var item = doc.toObject(Verse::class.java)
+                list.add(item)
             }
-            verses.value = savedAddressList
+            verses.value = list
         })
 
         return verses
     }
+    fun getNotes(): LiveData<List<NoteCardViewItem>> {
+        firebaseRepository.getNotesQuery()
+            .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    notes.value = null
+                    return@EventListener
+                }
+
+                var list: MutableList<NoteCardViewItem> = mutableListOf()
+                for (doc in value!!) {
+                    var item = doc.toObject(NoteCardViewItem::class.java)
+                    list.add(item)
+                }
+                firebaseRepository.getClassesList {
+                    it.forEach { aa ->
+                        firebaseRepository.getNotesShareQuery(aa.key)
+                            .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+                                if (e != null) {
+                                    Log.w(TAG, "Listen failed.", e)
+                                    notes.value = null
+                                    return@EventListener
+                                }
+
+                                //var list: MutableList<NoteCardViewItem> = mutableListOf()
+                                for (doc in value!!) {
+                                    var item = doc.toObject(NoteCardViewItem::class.java)
+                                    if(item.user!!.email != (MainActivity.user.email))
+                                        list.add(item)
+                                }
+                                notes.value = list
+                            })
+                    }
+                }
+
+                notes.value = list
+            })
+
+        return notes
+    }
+
 }

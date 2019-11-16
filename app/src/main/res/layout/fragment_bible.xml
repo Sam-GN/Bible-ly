@@ -8,14 +8,29 @@
     android:layout_height="match_parent">
 
 
-    <LinearLayout
-        android:id="@+id/ll_bible_chapters"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bible_book"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="chapter"
+        app:cornerRadius="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="match_parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="1dp"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/ll_bible_chapters"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:orientation="horizontal"
-        android:gravity="center">
+       android:gravity="center"
+        android:layout_marginEnd="30dp">
+
 
         <ImageButton
             android:id="@+id/ib_bible_previous_chapter"
@@ -39,6 +54,7 @@
             android:src="@drawable/ic_navigate_next_black_24dp"
             android:background="?android:attr/selectableItemBackground"/>
     </LinearLayout>
+
 
 
     <androidx.recyclerview.widget.RecyclerView

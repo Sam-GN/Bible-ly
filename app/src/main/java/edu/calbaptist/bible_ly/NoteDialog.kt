@@ -28,6 +28,7 @@ private var verseText:String? = ""
 private var isNew:Boolean? = true
 private lateinit var myView: View
 
+
 private var mapofClasses:Map<String,String>? = null
 
 
@@ -42,16 +43,12 @@ class NoteDialog: DialogFragment() {
         notePath = arguments?.getString("notePath")
         isNew = arguments?.getBoolean("isNew")
 
-        /*getClass(classPath!!){ clazz ->
-            clss = clazz
-            if(!isNew!!)
-                getEvent(eventPath!!){
-                    event = it
-                    updateui()
-                }
-            else
+        if(!isNew!!)
+            FirestoreRepository().getNote(notePath!!){ notee ->
+                note = notee
                 updateui()
-        }*/
+            }
+
         return createDialog()
     }
     @SuppressLint("SetTextI18n")
@@ -90,22 +87,34 @@ class NoteDialog: DialogFragment() {
             // Set layout to use when the list of choices appear
             aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             myView.sp_note_frag_note_class.adapter = aa
+            if(!isNew!!){
+                var i =0
+                for( c in list) {
+                    if(c.key == note.clss){
+                        myView.sp_note_frag_note_class.setSelection(i)
+                        break
+                    }
+                    i++
+
+                }
+            }
         }
-       /* myView.tf_event_frag_className.editText!!.setText(clss!!.name)
-        myView.tf_event_frag_className.editText!!.isFocusable = false
         if(!isNew!!){
-            myView.et_event_frag_title.setText( event.name)
-            myView.btn_event_frag_date.text =( event.date?.toLocalDateString(true))
-            myView.btn_event_frag_date.tag = Calendar.getInstance().apply { time= event.date}
-            myView.et_event_frag_description.setText(event.description)
-            if(!isTeacher!!){
-                myView.et_event_frag_title.isFocusable = false
-                myView.btn_event_frag_date.isClickable = false
-                myView.et_event_frag_description.isFocusable = false
+            myView.et_note_frag_note.setText( note.noteText)
+            myView.et_note_frag_title.setText( note.noteTitle)
+            myView.sp_note_frag_note_type.setSelection(
+                when (note.type){
+                    "For Self" -> 0
+                    "For Class" -> 1
+                    else -> -1
+                }
+            )
+            if(note.type==
+                "For Self"){
+                myView.sp_note_frag_note_class.visibility = View.GONE
             }
 
-
-        }*/
+        }
     }
     private fun createDialog():Dialog{
       val  view =LayoutInflater.from(requireContext()).inflate(R.layout.note_detailed_fragment, null)
@@ -127,6 +136,7 @@ class NoteDialog: DialogFragment() {
             .setView(view)//.create()
 
 
+
         var dialoge = dialogeBuilder.create()
         dialoge.show()
         (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
@@ -138,14 +148,15 @@ class NoteDialog: DialogFragment() {
 
             FirestoreRepository().saveNote(
                 isNew!!,book!!, verseNum!!, verseChapter!!, verseText!!
-                , myView.et_note_frag_note.toString(), myView.et_note_frag_title.text.toString(),
+                , myView.et_note_frag_note.text.toString(), myView.et_note_frag_title.text.toString(),
                 notePath!!, myView.sp_note_frag_note_type.selectedItem.toString(),
                 if( myView.sp_note_frag_note_type.selectedItemPosition !=0)  mapofClasses!!.filterValues { it == myView.sp_note_frag_note_class.selectedItem.toString() }.keys.first() else ""
             )
 
             dialoge.dismiss()
         }
-        updateui()
+        if(isNew!!)
+            updateui()
         return dialoge
     }
    companion object{
