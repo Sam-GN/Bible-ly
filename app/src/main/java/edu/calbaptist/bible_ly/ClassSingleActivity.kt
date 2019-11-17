@@ -39,7 +39,7 @@ private lateinit var classTokens: ArrayList<Token>
 
 private lateinit var path: String
 private var iAmTeacher: Boolean = false
-private lateinit var mmenu: Menu
+private var mmenu: Menu? = null
 
 
 
@@ -90,6 +90,7 @@ class ClassSingleActivity : AppCompatActivity()
                                     document?.forEach { d -> d.reference.delete() }
 
                                 }
+
                             Toast.makeText(view.context,  "Student Removed", Toast.LENGTH_SHORT).show()
                             // this.finish()
                         })
@@ -132,7 +133,10 @@ class ClassSingleActivity : AppCompatActivity()
                                 }
 
                             Toast.makeText(view.context,  "Student Promoted", Toast.LENGTH_SHORT).show()
-                             this.finish()
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra("currentDestination", R.id.classes)
+                            startActivity(intent)
+                            this.finish()
                         })
                         .create()
 
@@ -192,7 +196,7 @@ class ClassSingleActivity : AppCompatActivity()
                     if(classs!!.teacher!!.email==MainActivity.user.email){
                         iAmTeacher = true
                        if(mmenu!=null)
-                           mmenu.removeItem(R.id.action_leave)
+                           mmenu!!.removeItem(R.id.action_leave)
                     } else {
                         btn_class_single_new_event.visibility = View.GONE
                         iAmTeacher = false
@@ -386,7 +390,8 @@ class ClassSingleActivity : AppCompatActivity()
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_class_single, menu)
         mmenu=menu
-
+        if(iAmTeacher)
+            mmenu!!.removeItem(R.id.action_leave)
         return true
     }
 
@@ -439,13 +444,14 @@ class ClassSingleActivity : AppCompatActivity()
 
 
 
-     /*override fun onBackPressed() {
+     override fun onBackPressed() {
 
-         //this.finish()
-            super.onBackPressed()
-        Toast.makeText(this,"haha",Toast.LENGTH_LONG).show()
+         val intent = Intent(this, MainActivity::class.java)
+         intent.putExtra("currentDestination", R.id.classes)
+         startActivity(intent)
+         this.finish()
 
-     }*/
+     }
 
     companion object{
         var classs: Class? = null

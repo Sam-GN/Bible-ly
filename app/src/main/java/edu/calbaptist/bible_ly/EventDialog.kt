@@ -117,6 +117,7 @@ class EventDialog: DialogFragment() {
                     ,clss,Date())
 
                 ref.set(ev)
+                sendNotification(classPath!!.split("/")[1],"New Event","Event "+view.et_event_frag_title.text+" created",requireContext())
             }else{
                 var ref = FirebaseFirestore.getInstance().document(eventPath!!)
                 var ev = Event(ref.path,view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time

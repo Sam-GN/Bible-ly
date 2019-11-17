@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="eventRepeatSpinnerItems">
-        <item>No Repeat</item>
-        <item>Weakly</item>
-        <item>Monthly</item>
-        <item>Yearly</item>
+    <string-array name="noteType">
+        <item>For Self</item>
+        <item>For Class</item>
     </string-array>
 
 </resources>

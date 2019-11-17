@@ -272,13 +272,15 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                                 var classes = document.documents
                                 for (clss in classes) {
                                     var c = clss.toObject(Class::class.java)
-                                    if(c!!.teacher!!.email == MainActivity.user.email){
-                                        Toast.makeText(requireContext(),"You can't join a class you teach",Toast.LENGTH_LONG).show()
-                                        return@getServerTimeStamp
-                                    }
+
 //                                    c!!.classID = clss.reference.path
                                     for (t in c!!.tokens) {
                                         if (t.id == id.toString()) {
+
+                                            if(c!!.teacher!!.email == MainActivity.user.email){
+                                                Toast.makeText(requireContext(),"You can't join a class you teach",Toast.LENGTH_LONG).show()
+                                                return@getServerTimeStamp
+                                            }
 
                                             if (t.expireDate!!.after(current.toDate())) {
 
@@ -294,7 +296,8 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                                                             FirebaseFirestore.getInstance().collection("User")
                                                                 .document(MainActivity.user.email)
                                                                 .collection("classes").document().set(c)
-                                                            FirebaseMessaging.getInstance().subscribeToTopic(c.classID)
+                                                            FirebaseMessaging.getInstance().subscribeToTopic(c.classID.split("/")[1]
+                                                            )
                                                         }
                                                         else{
                                                             Toast.makeText(requireContext(),"You are already in this class",Toast.LENGTH_LONG).show()
@@ -488,7 +491,7 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                         downloadUri.toString(),
                         ArrayList<Token>()
                     )
-                    FirebaseMessaging.getInstance().subscribeToTopic(biblelyClass.classID)
+                    //FirebaseMessaging.getInstance().subscribeToTopic(biblelyClass.classID)
                     eventRef.set(biblelyClass)
 
 //                    for(a in studentList){
@@ -519,7 +522,7 @@ class ClassesFragment : Fragment(), ClassAdapter.OnClassItemSelectedListener {
                 "",
                ArrayList<Token>()
             )
-            FirebaseMessaging.getInstance().subscribeToTopic(biblelyClass.classID)
+            //FirebaseMessaging.getInstance().subscribeToTopic(biblelyClass.classID)
             eventRef.set(biblelyClass)
 //            for(a in studentList){
 //                val ref2 = fireStore.document(eventRef.path).collection("students").document()
