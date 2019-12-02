@@ -3,6 +3,7 @@ package edu.calbaptist.bible_ly.ui.bible
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -13,18 +14,14 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.navigation.NavigationView
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import edu.calbaptist.Note_ly.adapter.NoteMutableListAdapter
 import edu.calbaptist.bible_ly.*
 import edu.calbaptist.bible_ly.adapter.BibleMutableListAdapter
-import edu.calbaptist.bible_ly.adapter.EventMutableListAdapter
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_bible.*
 import kotlinx.android.synthetic.main.fragment_bible.view.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+//import org.jetbrains.anko.doAsync
+//import org.jetbrains.anko.uiThread
+
+public const val TAG = "BibleFragment"
 
 class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedListener,
     BibleMutableListAdapter.OnBibleItemLongSelectedListener ,
@@ -100,7 +97,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
                 R.id.bible_note_go_verse-> {
                     chapter = note.verseChapter.toInt()
-                    reloadChapter(note.verseNum.toInt()-1)
+                    reloadChapter(note.book.toInt(), note.verseNum.toInt()-1)
                     MainActivity.drawerLayout.closeDrawer(GravityCompat.END)
 
                 }
@@ -154,6 +151,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
     lateinit var noteAdapter: NoteMutableListAdapter
 
     var chapter = 1
+    var book = 1
 
     lateinit var myRoot:View
 
@@ -184,7 +182,8 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 //        bibleViewModel.text.observe(this, Observer {
 //            textView.text = it
 //        })
-        reloadChapter(0)
+        reloadBook(1) // Note: this initializes the bible with book 1 chapter 1
+        //reloadChapter(1, 0)
 
         bibleViewModel.getNotes().observe(this, Observer {list ->
 
@@ -198,17 +197,20 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         myRoot.ib_bible_next_chapter.setOnClickListener {
             if(chapter!=50) {
                 chapter++
-                reloadChapter(0)
+                reloadChapter(book, chapter)
             }
         }
         myRoot.ib_bible_previous_chapter.setOnClickListener {
             if(chapter!=0) {
                 chapter--
-                reloadChapter(0)
+                reloadChapter(book, chapter)
             }
         }
         myRoot.btn_bible_chapter.setOnClickListener {
             selectChapterDialog()
+        }
+        myRoot.btn_bible_book.setOnClickListener{
+            selectBookDialog()
         }
 
         return myRoot
@@ -217,6 +219,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
         var list2 = mutableListOf<NoteCardViewItem>()
         var chapter = ""
+
         for (note in  list.sortedBy { a -> a.verseChapter}){
             if(chapter != note.verseChapter){
                 list2.add(note.copy(isHeader = true))
@@ -224,35 +227,47 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
             }
             list2.add(note.copy(isHeader = false))
         }
+
         noteAdapter.submitList(list2)
         //adapter2.notifyDataSetChanged()
         ////noteRecyclerView.adapter = noteAdapter
     }
-    fun reloadChapter(verseNum:Int){
-        bibleViewModel.getVerses(chapter.toString()).observe(this, Observer { list ->
-            reloadBible(list.sortedBy { it.getVerseAsInt() },verseNum)
+    fun reloadChapter(bookNum:Int, chapterNum: Int){
+        bibleViewModel.getVerses(bookNum.toString(), chapterNum.toString()).observe(this, Observer { list ->
+            reloadBible(chapterNum, list.sortedBy { it.getVerseAsInt() }, 1) // note: always start with 1st verse
         })
-        myRoot.btn_bible_chapter.text = "Chapter "+chapter.toString()
+
+        myRoot.btn_bible_chapter.text = "Chapter "+ chapter.toString()
     }
-    fun reloadBible(verseList:List<Verse>,verseNum:Int){
+    fun reloadBook(bookNum: Int){
+        bibleViewModel.getBibleKeys()
+        bibleViewModel.getBibleBook(bookNum.toString()).observe(this, Observer { bible ->
+            reloadBible(1, bible.verses.sortedBy { it.getVerseAsInt() }, 1) // note: always start at the beginning
+        })
+
+        Log.d(TAG, book.toString())
+        myRoot.btn_bible_book.text = "Book "+ book.toString()
+    }
+    fun reloadBible(chapterNum: Int, verseList:List<Verse>, verseNum:Int){
         //Toast.makeText(requireContext(),eventList.size.toString(), Toast.LENGTH_SHORT).show()
         adapter.submitList(verseList)
         //adapter2.notifyDataSetChanged()
         bibleRecyclerView.adapter = adapter
 
+        bibleRecyclerView.smoothSnapToPosition(verseNum)
 
-        doAsync {
-            //Execute all the long running tasks here
-                try {
-                    Thread.sleep(400)
-                    uiThread {
-                        bibleRecyclerView.smoothSnapToPosition(verseNum)
-                    }
-                }catch (e: InterruptedException) {
-                    // do something if thread doesn't work
-                }
-
-            }
+//        doAsync {
+//            //Execute all the long running tasks here
+//                try {
+//                    Thread.sleep(400)
+//                    uiThread {
+//                        bibleRecyclerView.smoothSnapToPosition(verseNum)
+//                    }
+//                }catch (e: InterruptedException) {
+//                    // do something if thread doesn't work
+//                }
+//
+//            }
 
 
     }
@@ -276,19 +291,47 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
             .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
             })
-
             .create()
-        var listItems= mutableListOf<String>()
-        for (i in 1..50)
-            listItems.add("Chapter "+i)
+
+        var listItems = mutableListOf<String>() // bibleViewModel.verses.value!! //.distinctBy { it.chapter }
+        for (i in 1..bibleViewModel.bible.value!!.numOfChapters)
+            listItems.add("Chapter "+ i)
+
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItems)
         var list = ListView(requireContext())
         list.adapter = adapter
         list.setOnItemClickListener { parent, view, position, id ->
-            chapter=position+1
-            reloadChapter(0)
+            chapter = position + 1
+            reloadChapter(book, chapter)
             dialoge.dismiss()
         }
+
+        dialoge.setView(list)
+        dialoge.show()
+    }
+
+    private fun selectBookDialog() {
+
+        var dialoge = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setTitle("Select Book")
+            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+                //Action goes here
+            })
+            .create()
+
+        // NOTE: hardcoded to only get first 19 books. We don't have the rest of the bible in firebase
+        var listItems = bibleViewModel.books.value!!.filter { it.bookNumber <= 19 }.map { it.name }
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItems)
+        var list = ListView(requireContext())
+        list.adapter = adapter
+        list.setOnItemClickListener { parent, view, position, id ->
+            book = position + 1
+            reloadBook(book)
+            dialoge.dismiss()
+        }
+
         dialoge.setView(list)
         dialoge.show()
     }
@@ -302,6 +345,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         menu.getItem(R.id.action_settings).isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
     }
+
     fun RecyclerView.smoothSnapToPosition(position: Int, snapMode: Int = LinearSmoothScroller.SNAP_TO_START) {
         val smoothScroller = object: LinearSmoothScroller(this.context) {
             override fun getVerticalSnapPreference(): Int {

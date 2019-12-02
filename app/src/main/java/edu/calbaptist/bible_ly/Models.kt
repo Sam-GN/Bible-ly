@@ -50,6 +50,28 @@ data class Verse(
     fun getVerseAsInt():Int{
         return verse.toInt()
     }
+    fun chapterAsInt():Int{
+        return chapter.toInt()
+    }
+}
+
+data class Bible(
+    var numOfChapters: Int,
+    var verses: List<Verse>
+) {
+    constructor(): this(0, ArrayList<Verse>())
+}
+
+data class BibleKey (
+    val bookNumber: Int,
+    val genreId: String,
+    val name: String,
+    val testament: String
+) {
+    constructor() : this( 0,"","", "")
+    fun getBibleKeyBookNumberAsInt():Int {
+        return bookNumber.toInt()
+    }
 }
 
 data class User(

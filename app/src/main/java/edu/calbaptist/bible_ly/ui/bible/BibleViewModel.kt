@@ -6,10 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.QuerySnapshot
-import edu.calbaptist.bible_ly.FirestoreRepository
-import edu.calbaptist.bible_ly.MainActivity
-import edu.calbaptist.bible_ly.NoteCardViewItem
-import edu.calbaptist.bible_ly.Verse
+import edu.calbaptist.bible_ly.*
 
 class BibleViewModel : ViewModel() {
 
@@ -19,13 +16,71 @@ class BibleViewModel : ViewModel() {
 //    val text: LiveData<String> = _text
 val TAG = "FIRESTORE_VIEW_MODEL"
     var firebaseRepository = FirestoreRepository()
+    var books : MutableLiveData<List<BibleKey>> = MutableLiveData()
+    var numOfchapters : MutableLiveData<Int> = MutableLiveData()
     var verses : MutableLiveData<List<Verse>> = MutableLiveData()
     var notes : MutableLiveData<List<NoteCardViewItem>> = MutableLiveData()
+    var bible : MutableLiveData<Bible> = MutableLiveData()
     // get realtime updates from firebase regarding saved addresses
 
 
-    fun getVerses(chapter:String): LiveData<List<Verse>>{
-        firebaseRepository.getVersesQuery("1",chapter).addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+    fun getBibleKeys(): LiveData<List<BibleKey>>{
+        firebaseRepository.getBibleKeysQuery().addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                books.value = null
+                return@EventListener
+            }
+
+            var list : MutableList<BibleKey> = mutableListOf()
+            for (doc in value!!) {
+                var item = BibleKey(
+                    doc["bookNumber"].toString().toInt(),
+                    doc["genreId"].toString(),
+                    doc["name"].toString(),
+                    doc["testament"].toString()
+                )
+                list.add(item)
+            }
+
+            books.value = list
+        })
+
+        return books
+    }
+
+    fun getBibleBook(book:String): LiveData<Bible> {
+        firebaseRepository.getBookQuery(book).addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                bible.value = null
+                verses.value = null
+                return@EventListener
+            }
+
+            var list : MutableList<Verse> = mutableListOf()
+            var numOfChapters : Int = 0
+
+            for (doc in value!!) {
+                var item = doc.toObject(Verse::class.java)
+
+                if (!list.any { x -> x.chapter == item.chapter }) {
+                    numOfChapters++
+                }
+
+                list.add(item)
+            }
+
+            Log.d(TAG, "chapter size: " + numOfChapters.toString())
+            bible.value = Bible(numOfChapters, list)
+            verses.value = list
+        })
+
+        return bible
+    }
+
+    fun getVerses(book:String, chapter:String): LiveData<List<Verse>>{
+        firebaseRepository.getVersesQuery(book,chapter).addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e)
                 verses.value = null
@@ -37,6 +92,7 @@ val TAG = "FIRESTORE_VIEW_MODEL"
                 var item = doc.toObject(Verse::class.java)
                 list.add(item)
             }
+            Log.d(TAG, "verses size: " + list.size.toString())
             verses.value = list
         })
 
