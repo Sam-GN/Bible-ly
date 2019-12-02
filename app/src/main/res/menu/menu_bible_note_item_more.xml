@@ -7,15 +7,10 @@
         android:orderInCategory="100"
         android:title="Go to Verse"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/bible_note_edit_note"
-        android:orderInCategory="200"
-        android:title="Edit Note"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/bible_note_delete_note"
-        android:orderInCategory="300"
+        android:orderInCategory="200"
         android:title="Delete Note"
         app:showAsAction="never" />
 

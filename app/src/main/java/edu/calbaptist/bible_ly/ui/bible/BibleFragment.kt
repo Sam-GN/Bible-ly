@@ -34,7 +34,9 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
     }
 
     override fun onNoteItemSelected(item: NoteCardViewItem) {
-
+        var d = NoteDialog.newInstance(false, item.noteID,item.book,item.verseNum,item.verseChapter,item.verseText)
+        val fm = requireActivity().supportFragmentManager
+        d.show(fm,"NoteDialog")
     }
 
     override fun onBibleItemLongSelected(
@@ -88,8 +90,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         popup = PopupMenu(view.context, view)
         popup.inflate(R.menu.menu_bible_note_item_more)
 
-        if(note.type == "For Class" && note.user!!.email != MainActivity.user.email){
-            popup.menu.removeItem(R.id.bible_note_edit_note)
+        if(note.shared&& note.user!!.email != MainActivity.user.email){
             popup.menu.removeItem(R.id.bible_note_delete_note)
         }
 
@@ -106,11 +107,6 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
                 }
 
 
-                R.id.bible_note_edit_note-> {
-                    var d = NoteDialog.newInstance(false, note.noteID,note.book,note.verseNum,note.verseChapter,note.verseText)
-                    val fm = requireActivity().supportFragmentManager
-                    d.show(fm,"NoteDialog")
-                }
 
                 R.id.bible_note_delete_note-> {
                     var dialoge = AlertDialog.Builder(requireContext())
@@ -163,8 +159,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         savedInstanceState: Bundle?
     ): View? {
 
-        MainActivity.mainMenu!!.getItem(0).isVisible = true
-        MainActivity.mainMenu!!.getItem(1).isVisible = true
+
         bibleViewModel =
             ViewModelProviders.of(this).get(BibleViewModel::class.java)
          myRoot = inflater.inflate(R.layout.fragment_bible, container, false)
@@ -299,7 +294,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main, menu);
-        menu.getItem(R.id.action_settings).isVisible = false
+
         super.onCreateOptionsMenu(menu, inflater)
     }
     fun RecyclerView.smoothSnapToPosition(position: Int, snapMode: Int = LinearSmoothScroller.SNAP_TO_START) {
@@ -315,4 +310,5 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         smoothScroller.targetPosition = position
         layoutManager?.startSmoothScroll(smoothScroller)
     }
+
 }

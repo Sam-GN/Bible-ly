@@ -10,6 +10,6 @@
     <item
         android:id="@+id/students_item_action_promote"
         android:orderInCategory="200"
-        android:title="Promote to teacher"
+        android:title="Promote to Teacher"
         app:showAsAction="never" />
 </menu>

@@ -1,25 +1,14 @@
 package edu.calbaptist.bible_ly.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
-import edu.calbaptist.bible_ly.Class
 import edu.calbaptist.bible_ly.R
 import edu.calbaptist.bible_ly.Verse
 import kotlinx.android.synthetic.main.list_bible_item.view.*
-import java.io.IOException
-
-
-
 
 
 open class BibleMutableListAdapter (private val listener: OnBibleItemSelectedListener,private val listenerLong: OnBibleItemLongSelectedListener)
@@ -64,7 +53,8 @@ open class BibleMutableListAdapter (private val listener: OnBibleItemSelectedLis
         ) {
 
             itemView.tv_bible_verse.text = verse.text
-            itemView.tv_bible_verse_num.text = verse.verse.toString()
+            itemView.tv_bible_verse_num.text = verse.verse
+
             // Click listener
             itemView.setOnClickListener {
                 listener?.onBibleItemSelected(verse)

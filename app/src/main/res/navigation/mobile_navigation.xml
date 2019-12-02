@@ -9,13 +9,9 @@
         android:id="@+id/nav_board"
         android:name="edu.calbaptist.bible_ly.ui.board.BoardFragment"
         android:label="@string/menu_board"
-        tools:layout="@layout/fragment_board" />
+        tools:layout="@layout/fragment_board"
+        />
 
-    <fragment
-        android:id="@+id/nav_notes"
-        android:name="edu.calbaptist.bible_ly.ui.notes.NotesFragment"
-        android:label="@string/menu_notes"
-        tools:layout="@layout/fragment_notes" />
 
     <fragment
         android:id="@+id/nav_bible"
@@ -24,22 +20,11 @@
         tools:layout="@layout/fragment_bible" />
 
     <fragment
-        android:id="@+id/classes"
+        android:id="@+id/nav_classes"
         android:name="edu.calbaptist.bible_ly.ui.classes.ClassesFragment"
         android:label="@string/menu_classes"
         tools:layout="@layout/fragment_classes" />
 
-    <fragment
-        android:id="@+id/nav_calendar"
-        android:name="edu.calbaptist.bible_ly.ui.calendar.CalendarFragment"
-        android:label="@string/menu_calendar"
-        tools:layout="@layout/fragment_calendar" />
-
-    <fragment
-        android:id="@+id/nav_send"
-        android:name="edu.calbaptist.bible_ly.ui.send.SendFragment"
-        android:label="@string/menu_send"
-        tools:layout="@layout/fragment_send" />
 
 
 </navigation>

@@ -75,7 +75,12 @@ open class NoteMutableListAdapter (private val listener: OnNoteItemSelectedListe
                 itemView.tv_bible_note_text.text = note.noteText
                 itemView.tv_bible_note_title.text = note.noteTitle
                 itemView.tv_bible_note_date.text = note.date!!.toLocalDateString(false)
-                if(note.type=="For Class") {
+                if(note.hasComment)
+                    itemView.iv_bible_note_hasComment.visibility = View.VISIBLE
+                else
+                    itemView.iv_bible_note_hasComment.visibility = View.INVISIBLE
+
+                if(note.shared) {
                     if(note.user!!.email==MainActivity.user.email){
                         itemView.iv_bible_note_type.setImageResource(R.drawable.ic_question_answer_black_24dp)
                     } else {
@@ -95,13 +100,16 @@ open class NoteMutableListAdapter (private val listener: OnNoteItemSelectedListe
                     return@setOnLongClickListener true
                 }
                 itemView.iv_bible_note_type.setOnClickListener {
-                    if(note.type=="For Class") {
+                    if(note.shared) {
                         if(note.user!!.email==MainActivity.user.email){
-                            Toast.makeText(itemView.context,"You have shared this note",Toast.LENGTH_LONG).show()
+                            Toast.makeText(itemView.context,"You have shared this note",Toast.LENGTH_SHORT).show()
                         } else {
-                            Toast.makeText(itemView.context,"This Note is shared with your class",Toast.LENGTH_LONG).show()
+                            Toast.makeText(itemView.context,"This Note is shared with your class",Toast.LENGTH_SHORT).show()
                         }
                     }
+                }
+                itemView.iv_bible_note_hasComment.setOnClickListener {
+                    Toast.makeText(itemView.context,"This note has comments",Toast.LENGTH_SHORT).show()
                 }
 
             }

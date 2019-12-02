@@ -1,12 +1,8 @@
 package edu.calbaptist.bible_ly
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -19,41 +15,26 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
-import androidx.navigation.NavController
+import androidx.core.view.GravityCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 //import com.google.android.gms.common.api.Response
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
-import org.json.JSONException
-import org.json.JSONObject
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 
 private const val TAG = "UserFireStore"
 private var currentDestination = R.id.nav_board
-
+private var previousDestination = -1
+private var mainMenu: Menu? = null
 
 
 class MainActivity : AppCompatActivity() {
@@ -106,6 +87,7 @@ class MainActivity : AppCompatActivity() {
 //                //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
 //            })
 
+        //var a = getCurrentActivity(this)
         val acct = GoogleSignIn.getLastSignedInAccount(this)
         if (acct != null) {
             val personName = acct.displayName
@@ -121,23 +103,35 @@ class MainActivity : AppCompatActivity() {
                batch.set(eventRef, event)*/
             user = User(personName!!,personGivenName!!,personFamilyName!!,personEmail,personPhoto.toString()!!)
             usersRef.set( user)
-
+            FirebaseMessaging.getInstance().subscribeToTopic("SendToUser_"+personEmail.replace("@","_"))
         }
+
 
 
 
         drawerLayout  = findViewById(R.id.drawer_layout)
         navView  = findViewById(R.id.nav_view)
+//        navView.setNavigationItemSelectedListener{ menuItem ->
+//            if(menuItem.itemId == R.id.nav_share)
+//                Toast.makeText(this,"HAHA",Toast.LENGTH_SHORT).show()
+//            // close drawer when item is tapped
+//               drawerLayout.closeDrawers()
+//
+//            // Add code here to update the UI based on the item selected
+//            // For example, swap UI fragments here
+//
+//            true
+//        }
         navView2  = findViewById(R.id.nav_view2)
         val navController = findNavController(R.id.nav_host_fragment)
-        //if(bundle != null)
-             navController.navigate(currentDestination)
+
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_board, R.id.nav_notes, R.id.nav_bible,
-                R.id.classes, R.id.nav_calendar, R.id.nav_send
+                R.id.nav_board, R.id.nav_bible,
+                R.id.nav_classes, R.id.nav_share
             ), drawerLayout
         )
         //navController.navigate( R.id.classes)
@@ -153,7 +147,89 @@ class MainActivity : AppCompatActivity() {
             signOut()
         }
         updateNavHeader()
+
+        if(currentDestination!=0) {
+
+            if (currentDestination == R.id.nav_classes) {
+                mainMenu?.getItem(0)?.isVisible = false
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+            }
+            //when user clicks on new comment notification
+            if (currentDestination == R.id.nav_bible) {
+                mainMenu?.getItem(0)?.isVisible = true
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                drawer_layout.openDrawer(GravityCompat.END)
+                var noteID = bundle?.getString("noteID") ?: ""
+                if(noteID!="") {
+                    FirestoreRepository().getNote(noteID){ notee ->
+                        var item = notee
+                        var d = NoteDialog.newInstance(
+                            false,
+                            noteID,
+                            item.book,
+                            item.verseNum,
+                            item.verseChapter,
+                            item.verseText
+                        )
+                        val fm = supportFragmentManager
+                        d.show(fm, "NoteDialog")
+                    }
+
+                }
+            }
+            if (currentDestination == R.id.nav_board) {
+                mainMenu?.getItem(0)?.isVisible = false
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                var eventID = bundle?.getString("eventID") ?: ""
+                var classID = bundle?.getString("classID") ?: ""
+                if(eventID!="") {
+
+                    var d = EventDialog.newInstance(false, false , classID,eventID)
+                    val fm = supportFragmentManager
+                    d.show(fm,"EventDialog")
+                }
+            }
+            navController.navigate(currentDestination)
+            navView.setNavigationItemSelectedListener { menuItem ->
+                when (menuItem.itemId) {
+
+                    R.id.nav_board -> {
+                        navController.navigate(R.id.nav_board)
+                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                        mainMenu?.getItem(0)?.isVisible = false
+                        previousDestination = currentDestination
+                        currentDestination = R.id.nav_board
+                    }
+
+                    R.id.nav_bible -> {
+                        navController.navigate(R.id.nav_bible)
+                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                        mainMenu?.getItem(0)?.isVisible = true
+                        previousDestination = currentDestination
+                        currentDestination = R.id.nav_bible
+                    }
+
+                    R.id.nav_classes -> {
+                        navController.navigate(R.id.nav_classes)
+                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                        mainMenu?.getItem(0)?.isVisible = false
+                        previousDestination = currentDestination
+                        currentDestination = R.id.nav_classes
+                    }
+
+                    R.id.nav_share -> { Toast.makeText(this,"For sharing Links",Toast.LENGTH_SHORT).show()
+                    }
+
+                }
+                drawerLayout.closeDrawers()
+                true
+            }
+
+
+        }
+
     }
+
 
     fun updateNavHeader(){
         tvNavName.text = user.userName
@@ -168,8 +244,8 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
        mainMenu = menu
-       menu.getItem(0).isVisible = false
-       menu.getItem(1).isVisible = false
+       if(currentDestination!=R.id.nav_bible)
+            menu.getItem(0).isVisible = false
     /*    if (currentDestination ==  R.id.nav_bible)
             menu.removeItem(R.id.action_settings)*/
         return true
@@ -189,25 +265,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
                 }
             }*/
-            R.id.action_settings -> {
-
-                ll_bible_nav_notes.visibility = View.GONE
-                ll_bible_nav_chat.visibility = View.VISIBLE
-
-
-               // sendNotification("PEeMGAkbsMXXXbDz7lfE","hi","Hello",this)
-
-                    if(drawer_layout.isDrawerOpen(Gravity.END)) {
-                        //  drawer_layout.closeDrawer(Gravity.LEFT);
-
-                    }
-                    else {
-                        drawer_layout.openDrawer(Gravity.END);
-                        //Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
-                    }
-
-
-            }
 
             R.id.action_notes -> {
 
@@ -217,12 +274,12 @@ class MainActivity : AppCompatActivity() {
 
                 // sendNotification("PEeMGAkbsMXXXbDz7lfE","hi","Hello",this)
 
-                if(drawer_layout.isDrawerOpen(Gravity.END)) {
+                if(drawer_layout.isDrawerOpen(GravityCompat.END)) {
                     //  drawer_layout.closeDrawer(Gravity.LEFT);
                     //Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
                 }
                 else {
-                    drawer_layout.openDrawer(Gravity.END);
+                    drawer_layout.openDrawer(GravityCompat.END)
                    // Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
                 }
 
@@ -248,9 +305,29 @@ class MainActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         lateinit var user:User
-        lateinit var mainMenu: Menu
+         ////var mainMenu: Menu? = null
         lateinit var navView2: NavigationView
         lateinit var drawerLayout: DrawerLayout
+        var currentNoteID = ""
+
+    }
+
+    override fun onBackPressed() {
+
+        if( drawer_layout.isDrawerOpen(GravityCompat.START)){
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else if (drawer_layout.isDrawerOpen(GravityCompat.END)) {
+            drawer_layout.closeDrawer(GravityCompat.END)
+        } else {
+            if(currentDestination == R.id.nav_board)
+                this.finish()
+            else {
+                currentDestination = previousDestination
+                super.onBackPressed()
+            }
+        }
+        //additional code
+
 
     }
 

@@ -3,20 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="edu.calbaptist.bible_ly.ClassSingleActivity">
     <item
-        android:id="@+id/action_leave_class"
+        android:id="@+id/note_comment_more_edit"
         android:orderInCategory="100"
-        android:title="Leave Class"
+        android:title="Edit Comment"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_edit_class"
+        android:id="@+id/note_comment_more_delete"
         android:orderInCategory="200"
-        android:title="Edit Class"
+        android:title="Delete Comment"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_delete_class"
-        android:orderInCategory="300"
-        android:title="Delete Class"
-        app:showAsAction="never" />
 </menu>

@@ -1,7 +1,5 @@
 package edu.calbaptist.bible_ly
 
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -23,7 +21,7 @@ data class Token (
     constructor() : this( null,"",null)
 }
 
-data class Class (
+data class BiblelyClass (
     var classID: String,
     var teacher: User?,
     var isPublic: Boolean,
@@ -62,12 +60,22 @@ data class User(
 ) {
     constructor() : this( "","","", "","")
 }
-data class Response(
+data class Comment(
+    var path: String,
     var user:User?,
     var text:String,
     var date:Date?
 ){
-    constructor() : this( null, "",null)
+    constructor() : this( "",null, "",null)
+}
+data class CommentCardViewItem(
+    var path: String,
+    var userText:String,
+    var user:User?,
+    var text:String,
+    var date:Date?
+){
+    constructor() : this( "","",null, "",null)
 }
 data class Note(
     var noteID: String,
@@ -79,11 +87,11 @@ data class Note(
     val verseText: String,
     var noteText: String,
     var noteTitle: String,
-    var response:ArrayList<Response>,
-    var type:String,
+    var hasComment:Boolean,
+    var shared:Boolean,
     var clss:String
 ){
-    constructor() : this( "",null,null,"","","","", "","",ArrayList<Response>(),"","")
+    constructor() : this( "",null,null,"","","","", "","",false,false,"")
 }
 data class NoteCardViewItem(
     var isHeader:Boolean,
@@ -96,11 +104,11 @@ data class NoteCardViewItem(
     val verseText: String,
     var noteText: String,
     var noteTitle: String,
-    var response:ArrayList<Response>,
-    var type:String,
+    var hasComment:Boolean,
+    var shared:Boolean,
     var clss:String
 ){
-    constructor() : this( false,"",null,null,"","","","", "","",ArrayList<Response>(),"","")
+    constructor() : this( false,"",null,null,"","","","", "","",false,false,"")
 }
 
 data class Flag(
@@ -116,7 +124,7 @@ data class Question(
     val verse: Verse,
     var text: String,
     var isAnonymous: Boolean,
-    val className: Class
+    val biblelyClassName: BiblelyClass
 )
 
 data class Event(
@@ -126,7 +134,7 @@ data class Event(
     var date: Date? =null,
 //    var endDate: Date? = null,
     var description: String = "Event desc",
-    val clss: Class? = null,
+    val clss: BiblelyClass? = null,
     var createdDate: Date? = null
 ){
     constructor() : this( "","",null, "",null,null)
@@ -134,7 +142,7 @@ data class Event(
 
 data class ClassMember(
     val memberID: Int,
-    val className: Class,
+    val biblelyClassName: BiblelyClass,
     val user: User
 )
 

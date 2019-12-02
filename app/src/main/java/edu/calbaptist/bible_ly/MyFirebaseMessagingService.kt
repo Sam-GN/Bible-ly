@@ -21,51 +21,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
 
-        var classID = "Class/"+remoteMessage!!.data["topic"]
-        FirebaseFirestore.getInstance()
-            .collection("User").document(MainActivity.user.email).collection("classes")
-            .whereEqualTo("classID",classID).get().addOnSuccessListener {document ->
-                if(document.isEmpty){
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(remoteMessage!!.data["topic"])
-                } else {
-                    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    val NOTIFICATION_CHANNEL_ID = "Nilesh_channel"
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val notificationChannel = NotificationChannel(NOTIFICATION_CHANNEL_ID, "Your Notifications", NotificationManager.IMPORTANCE_HIGH)
-
-                        notificationChannel.description = "Description"
-                        notificationChannel.enableLights(true)
-                        notificationChannel.lightColor = Color.RED
-                        notificationChannel.vibrationPattern = longArrayOf(0, 1000, 500, 1000)
-                        notificationChannel.enableVibration(true)
-                        notificationManager.createNotificationChannel(notificationChannel)
+        if(remoteMessage!!.data["topic"]!!.startsWith("SendToUser_")){
+            if(remoteMessage!!.data["param1"] != MainActivity.currentNoteID)
+                showNotification(this,remoteMessage!!.data["title"].toString(),remoteMessage!!.data["message"].toString(),true,remoteMessage!!.data["param1"]!!,"")
+        }
+        else {
+            var classID = "Class/" + remoteMessage!!.data["topic"]
+            FirebaseFirestore.getInstance()
+                .collection("User").document(MainActivity.user.email).collection("classes")
+                .whereEqualTo("classID", classID).get().addOnSuccessListener { document ->
+                    if (document.isEmpty) {
+                        FirebaseMessaging.getInstance()
+                            .unsubscribeFromTopic(remoteMessage!!.data["topic"])
+                    } else {
+                        showNotification(this,remoteMessage!!.data["title"].toString(),remoteMessage!!.data["message"].toString(),false,remoteMessage!!.data["param1"]!!,classID)
                     }
-
-                    // to diaplay notification in DND Mode
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val channel = notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID)
-                        channel.canBypassDnd()
-                    }
-
-                    val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-
-                    notificationBuilder.setAutoCancel(true)
-                        .setColor(ContextCompat.getColor(this, R.color.colorAccent))
-                        .setContentTitle(remoteMessage!!.data["title"].toString())
-                        //.setContentText(remoteMessage!!.getNotification()!!.getBody())
-                        .setContentText(remoteMessage!!.data["message"].toString())
-                        .setDefaults(android.app.Notification.DEFAULT_ALL)
-                        .setWhen(System.currentTimeMillis())
-                        .setSmallIcon(R.drawable.ic_launcher_background)
-                        .setAutoCancel(true)
-
-
-                    notificationManager.notify(1000, notificationBuilder.build())
-
                 }
-
-            }
+        }
 
     }
 }
