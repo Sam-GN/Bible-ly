@@ -27,6 +27,18 @@ class FirestoreRepository {
     var firestoreDB = FirebaseFirestore.getInstance()
     var user = FirebaseAuth.getInstance().currentUser
 
+
+    // get saved addresses from firebase
+    fun getBibleKeysQuery(): Query {
+        return firestoreDB.collection("BibleKey")
+            .orderBy("bookNumber")
+    }
+
+    fun getBookQuery(book:String): Query {
+        return firestoreDB.collection("KingJamesVersion")
+            .whereEqualTo("book", book)
+    }
+
     // get saved addresses from firebase
     fun getClassesAsStudentQuery(): Query {
         return firestoreDB.collection("User").document(MainActivity.user.email).collection("classes")
