@@ -2,6 +2,7 @@ package edu.calbaptist.bible_ly.ui.bible
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -25,6 +26,9 @@ import kotlinx.android.synthetic.main.fragment_bible.*
 import kotlinx.android.synthetic.main.fragment_bible.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import android.widget.LinearLayout
+
+
 
 class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedListener,
     BibleMutableListAdapter.OnBibleItemLongSelectedListener ,
@@ -136,7 +140,18 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
     override fun onBibleItemSelected(item: Verse) {
 
     }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        //(findViewById(R.id.webviewPlace) as LinearLayout).removeAllViews()
+        /*val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.putExtra("currentDestination", R.id.nav_bible)
+        startActivity(intent)*/
+        //this.finish()
+        fragmentManager!!.popBackStack()
+        MainActivity.navigateDrawer()
 
+        super.onConfigurationChanged(newConfig)
+        //initUI()
+    }
 
 
     private lateinit var bibleViewModel: BibleViewModel
@@ -148,6 +163,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
     private lateinit var noteRecyclerView: RecyclerView
     lateinit var noteLinearLayoutManager: LinearLayoutManager
     lateinit var noteAdapter: NoteMutableListAdapter
+    lateinit var noNoteTV: TextView
 
     var chapter = 1
 
@@ -169,8 +185,16 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         bibleRecyclerView.layoutManager = linearLayoutManager
         adapter= BibleMutableListAdapter(this,this)
 
+        val orientation = resources.configuration.orientation
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            noteRecyclerView = myRoot.findViewById(R.id.rv_bible_nav_notes_land)
+            noNoteTV = myRoot.findViewById(R.id.tv_bible_nav_no_notes_land)
 
-        noteRecyclerView = MainActivity.navView2.findViewById(R.id.rv_bible_nav_notes)
+        } else {
+            noteRecyclerView = MainActivity.navView2.findViewById(R.id.rv_bible_nav_notes)
+            noNoteTV = MainActivity.navView2.findViewById(R.id.tv_bible_nav_no_notes)
+
+        }
         noteLinearLayoutManager = LinearLayoutManager(context)
         noteRecyclerView.layoutManager = noteLinearLayoutManager
         noteAdapter= NoteMutableListAdapter(this,this)
@@ -208,9 +232,16 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
         return myRoot
     }
-    fun reloadNotes(list:List<NoteCardViewItem>){
+    private fun reloadNotes(list:List<NoteCardViewItem>){
 
         var list2 = mutableListOf<NoteCardViewItem>()
+        if(list.isEmpty()){
+            noNoteTV.visibility=View.VISIBLE
+            noteRecyclerView.visibility =View.GONE
+        } else {
+            noNoteTV.visibility=View.GONE
+            noteRecyclerView.visibility=View.VISIBLE
+        }
         var chapter = ""
         for (note in  list.sortedBy { a -> a.verseChapter}){
             if(chapter != note.verseChapter){

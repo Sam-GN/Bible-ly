@@ -65,6 +65,7 @@
         android:text="Title"
       android:padding="5dp"
         android:layout_weight="6"
+        android:maxLines="2"
         />
 
         <ImageView
@@ -84,6 +85,7 @@
         android:layout_height="wrap_content"
         android:text="Text"
         android:padding="5dp"
+        android:maxLines="6"
         />
 
 

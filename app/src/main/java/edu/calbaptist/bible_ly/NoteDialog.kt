@@ -23,9 +23,17 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.calbaptist.Comment_ly.adapter.CommentMutableListAdapter
 import edu.calbaptist.bible_ly.ui.bible.BibleViewModel
 import android.app.Activity
+import android.view.WindowManager
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.text.FieldPosition
+import android.view.Gravity
+import android.widget.LinearLayout
+
+
+
+
+
 
 
 private lateinit var note:Note
@@ -123,6 +131,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         popup.show()
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
        // val rootView = inflater.inflate(R.layout.fraglayout, container)
         book = arguments?.getString("book")
         verseChapter = arguments?.getString("verseChapter")
@@ -239,50 +248,53 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
             myView.ll_note_frag_comment.visibility = View.GONE
         }
         myView.ib_note_frag_send.setOnClickListener {
-            FirestoreRepository().addComment(
-                notePath!!,
-                myView.et_note_frag_comment_text.text.toString()
-            )
-            //send notification to the note's creator
-            if (note!!.user!!.email != MainActivity.user.email)
-                sendNotification(
-                    "SendToUser_" + note!!.user!!.email.replace("@", "_"),
-                    "New Comment",
-                    myView.et_note_frag_comment_text.text.toString(),
-                    requireContext(),
-                    note.noteID
+            if( myView.et_note_frag_comment_text.text.toString()!="") {
+                FirestoreRepository().addComment(
+                    notePath!!,
+                    myView.et_note_frag_comment_text.text.toString()
                 )
+                //send notification to the note's creator
+                if (note!!.user!!.email != MainActivity.user.email)
+                    sendNotification(
+                        "SendToUser_" + note!!.user!!.email.replace("@", "_"),
+                        "New Comment",
+                        myView.et_note_frag_comment_text.text.toString(),
+                        requireContext(),
+                        note.noteID
+                    )
 
-            //send notification to every body in a note's comments section
-            FirestoreRepository().getCommentInvolvedUsers(note!!.noteID) { involvedUserEmailList ->
-                involvedUserEmailList.forEach { email ->
-                    if (email != MainActivity.user.email && note!!.user!!.email != email)
-                        sendNotification(
-                            "SendToUser_" + email.replace("@", "_"),
-                            "New Comment",
-                            myView.et_note_frag_comment_text.text.toString(),
-                            requireContext(),
-                            note.noteID
-                        )
+                //send notification to every body in a note's comments section
+                FirestoreRepository().getCommentInvolvedUsers(note!!.noteID) { involvedUserEmailList ->
+                    involvedUserEmailList.forEach { email ->
+                        if (email != MainActivity.user.email && note!!.user!!.email != email)
+                            sendNotification(
+                                "SendToUser_" + email.replace("@", "_"),
+                                "New Comment",
+                                myView.et_note_frag_comment_text.text.toString(),
+                                requireContext(),
+                                note.noteID
+                            )
 
 
+                    }
+                    // commentsRecyclerView.layoutManager!!.scrollToPosition(0)
                 }
-               // commentsRecyclerView.layoutManager!!.scrollToPosition(0)
+                myView.et_note_frag_comment_text.setText("")
+                currentItemPosition = 0
             }
-            myView.et_note_frag_comment_text.setText("")
-            currentItemPosition =0
-
         }
     }
     private fun createDialog():Dialog{
       val  view =LayoutInflater.from(requireContext()).inflate(R.layout.note_detailed_fragment, null)
         myView = view
    //     val view = layoutInflater.inflate(R.layout.event_detailed_fragment, null)
+//        val lptv = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+//        myView.layoutParams = lptv
 
 
 
 
-        var dialogeBuilder = AlertDialog.Builder(requireContext())
+        var dialogeBuilder = AlertDialog.Builder(requireContext(),R.style.full_screen_dialog)
            // .setTitle("New Event")
             .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
@@ -296,6 +308,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
 
         var dialoge = dialogeBuilder.create()
+
         dialoge.show()
         (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if (view.et_note_frag_note.text.toString().isEmpty()) {

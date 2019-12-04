@@ -2,6 +2,7 @@ package edu.calbaptist.bible_ly
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,6 +20,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GravityCompat
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -29,12 +31,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_bible.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 private const val TAG = "UserFireStore"
 private var currentDestination = R.id.nav_board
 private var previousDestination = -1
 private var mainMenu: Menu? = null
+lateinit var navController: NavController
 
 
 class MainActivity : AppCompatActivity() {
@@ -123,7 +129,7 @@ class MainActivity : AppCompatActivity() {
 //            true
 //        }
         navView2  = findViewById(R.id.nav_view2)
-        val navController = findNavController(R.id.nav_host_fragment)
+        navController = findNavController(R.id.nav_host_fragment)
 
 
         // Passing each menu ID as a set of Ids because each
@@ -194,6 +200,7 @@ class MainActivity : AppCompatActivity() {
                 when (menuItem.itemId) {
 
                     R.id.nav_board -> {
+                        fragmentManager.popBackStack()
                         navController.navigate(R.id.nav_board)
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = false
@@ -202,6 +209,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.nav_bible -> {
+                        fragmentManager.popBackStack()
                         navController.navigate(R.id.nav_bible)
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = true
@@ -210,6 +218,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     R.id.nav_classes -> {
+                        fragmentManager.popBackStack()
                         navController.navigate(R.id.nav_classes)
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = false
@@ -274,14 +283,30 @@ class MainActivity : AppCompatActivity() {
 
                 // sendNotification("PEeMGAkbsMXXXbDz7lfE","hi","Hello",this)
 
-                if(drawer_layout.isDrawerOpen(GravityCompat.END)) {
-                    //  drawer_layout.closeDrawer(Gravity.LEFT);
-                    //Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
+                val orientation = resources.configuration.orientation
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+
+                    ll_bible_nav_notes_land.apply {
+                        when(visibility){
+                            View.GONE -> visibility = View.VISIBLE
+                            View.VISIBLE -> visibility = View.GONE
+                        }  }
+
+                } else {
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
+                    if(drawer_layout.isDrawerOpen(GravityCompat.END)) {
+                        //  drawer_layout.closeDrawer(Gravity.LEFT);
+                        //Toast.makeText(this,"yaaa",Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        drawer_layout.openDrawer(GravityCompat.END)
+                        // Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
+                    }
+
                 }
-                else {
-                    drawer_layout.openDrawer(GravityCompat.END)
-                   // Toast.makeText(this,"yoo",Toast.LENGTH_LONG).show()
-                }
+
 
 
             }
@@ -310,6 +335,17 @@ class MainActivity : AppCompatActivity() {
         lateinit var drawerLayout: DrawerLayout
         var currentNoteID = ""
 
+        fun navigateDrawer(){
+            navController.navigate(R.id.nav_bible)
+            doAsync {
+                Thread.sleep(200)
+                uiThread {
+                    drawerLayout.closeDrawer(GravityCompat.END)
+                }
+            }
+
+        }
+
     }
 
     override fun onBackPressed() {
@@ -330,5 +366,6 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
 
 }
