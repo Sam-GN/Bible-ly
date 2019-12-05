@@ -12,12 +12,9 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
-import edu.calbaptist.bible_ly.Class
-import edu.calbaptist.bible_ly.Event
-import edu.calbaptist.bible_ly.MainActivity
+import edu.calbaptist.bible_ly.BiblelyClass
 import edu.calbaptist.bible_ly.R
 import kotlinx.android.synthetic.main.list_class_item_class.view.*
-import kotlinx.android.synthetic.main.list_event_item_board.view.*
 import java.io.IOException
 
 
@@ -57,7 +54,7 @@ open class ClassAdapter (query: Query, private val listener: OnClassItemSelected
           /*  if(!snapshot.reference.collection("students").whereEqualTo("email",MainActivity.user.email).get().isSuccessful) {
                 return
             }*/
-            val biblelyClass = snapshot.toObject(Class::class.java) ?: return
+            val biblelyClass = snapshot.toObject(BiblelyClass::class.java) ?: return
 
             val resources = itemView.resources
 

@@ -4,24 +4,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
-import edu.calbaptist.bible_ly.Class
 import edu.calbaptist.bible_ly.Event
 import edu.calbaptist.bible_ly.R
 import edu.calbaptist.bible_ly.toLocalDateString
-import kotlinx.android.synthetic.main.list_class_item_class.view.*
 import kotlinx.android.synthetic.main.list_event_item_board.view.*
-import java.io.IOException
-
-
-
 
 
 open class EventMutableListAdapter (private val listener: OnEventItemSelectedListener)
@@ -60,7 +49,7 @@ open class EventMutableListAdapter (private val listener: OnEventItemSelectedLis
             /*  if(!snapshot.reference.collection("students").whereEqualTo("email",MainActivity.user.email).get().isSuccessful) {
                   return
               }*/
-//            val biblelyClass = snapshot.toObject(Class::class.java) ?: return
+//            val biblelyClass = snapshot.toObject(BiblelyClass::class.java) ?: return
 //
 //            val resources = itemView.resources
 

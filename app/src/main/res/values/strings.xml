@@ -11,7 +11,7 @@
     <string name="menu_notes">Notes</string>
     <string name="menu_bible">Bible</string>
     <string name="menu_classes">Classes</string>
-    <string name="menu_calendar">Calendar</string>
+    <string name="menu_calendar">Share</string>
     <string name="menu_send">Send</string>
     <string name="header_sign_out">Sign Out</string>
     <string name="title_activity_class_single">ClassSingleActivity</string>

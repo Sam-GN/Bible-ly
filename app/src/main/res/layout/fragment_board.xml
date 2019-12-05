@@ -6,14 +6,19 @@
 
     <androidx.recyclerview.widget.RecyclerView
 
-        android:id="@+id/home_frag_main_recycleView"
+        android:id="@+id/rv_board_frag_events"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
-
-
     </androidx.recyclerview.widget.RecyclerView>
+    <TextView
+        android:id="@+id/tv_board_frag_noEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="There are no events"/>
 
   <!--  <Button
         android:id="@+id/button"

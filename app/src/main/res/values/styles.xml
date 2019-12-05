@@ -21,4 +21,10 @@
     <style name="menu_labels_style">
         <item name="android:textColor">@color/colorAccent</item>
     </style>
+    <style name="full_screen_dialog" parent="android:Theme.Holo.Light.Dialog.NoActionBar">
+
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+
+    </style>
 </resources>

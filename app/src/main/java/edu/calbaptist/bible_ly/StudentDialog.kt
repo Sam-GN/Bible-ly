@@ -32,7 +32,7 @@ class StudentDialog: DialogFragment() {
        // val rootView = inflater.inflate(R.layout.fraglayout, container)
         studentPath = arguments?.getString("studentPath")
 
-        getUser(studentPath!!){
+        FirestoreRepository().getUser(studentPath!!){
             student = it
             updateui()
         }
@@ -43,7 +43,7 @@ class StudentDialog: DialogFragment() {
         myView.tv_student_frag_email.setText(student!!.email)
         myView.tv_student_frag_lastname.setText(student!!.lastName)
         myView.tv_student_frag_name.setText(student!!.firstName)
-        myView.iv_student_frag_logo.setGlide(student!!.photoID)
+        myView.iv_student_frag_logo.setGlide(student!!.photoID,true)
         myView.ib_student_frag_email.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO)
             intent.data = Uri.parse("mailto:"+student!!.email) // only email apps should handle this

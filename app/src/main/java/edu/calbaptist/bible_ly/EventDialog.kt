@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.event_detailed_fragment.view.*
 import java.util.*
 
-private lateinit var clss:Class
+private lateinit var clss:BiblelyClass
 private lateinit var event:Event
 private var classPath:String? = ""
 private var eventPath:String? = ""
@@ -30,10 +30,10 @@ class EventDialog: DialogFragment() {
         eventPath = arguments?.getString("eventPath")
         isNew = arguments?.getBoolean("isNew")
         isTeacher = arguments?.getBoolean("isTeacher")
-        getClass(classPath!!){ clazz ->
+        FirestoreRepository().getClass(classPath!!){ clazz ->
             clss = clazz
             if(!isNew!!)
-                getEvent(eventPath!!){
+                FirestoreRepository().getEvent(eventPath!!){
                     event = it
                     updateui()
                 }
@@ -117,7 +117,7 @@ class EventDialog: DialogFragment() {
                     ,clss,Date())
 
                 ref.set(ev)
-                sendNotification(classPath!!.split("/")[1],"New Event","Event "+view.et_event_frag_title.text+" created",requireContext())
+                sendNotification(classPath!!.split("/")[1],"New Event","Event "+view.et_event_frag_title.text+" created",requireContext(),ref.path)
             }else{
                 var ref = FirebaseFirestore.getInstance().document(eventPath!!)
                 var ev = Event(ref.path,view.et_event_frag_title.text.toString(),(view.btn_event_frag_date.tag as Calendar).time

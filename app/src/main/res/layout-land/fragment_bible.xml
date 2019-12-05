@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
+
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="2"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp">
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bible_book"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="chapter"
+        app:cornerRadius="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="1dp"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/ll_bible_chapters"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+       android:gravity="center"
+        android:layout_marginEnd="30dp">
+
+
+        <ImageButton
+            android:id="@+id/ib_bible_previous_chapter"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_navigate_before_black_24dp"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_bible_chapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="chapter"
+            app:cornerRadius="20dp"
+
+            />
+        <ImageButton
+            android:id="@+id/ib_bible_next_chapter"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_navigate_next_black_24dp"
+            android:background="?android:attr/selectableItemBackground"/>
+    </LinearLayout>
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+
+        android:id="@+id/rv_bible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="true"
+        android:paddingBottom="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll_bible_chapters">
+
+
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="3dp"
+        android:layout_height="match_parent"
+        android:background="@color/light_grey">
+    </View>
+
+
+    <LinearLayout
+        android:id="@+id/ll_bible_nav_notes_land"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_weight="1">
+
+    <androidx.recyclerview.widget.RecyclerView
+
+        android:id="@+id/rv_bible_nav_notes_land"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="true"
+        android:paddingTop="5dp"/>
+
+    <TextView
+        android:id="@+id/tv_bible_nav_no_notes_land"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="You have no Notes, Long Press a verse to add a note"/>
+    </LinearLayout>
+
+</LinearLayout>

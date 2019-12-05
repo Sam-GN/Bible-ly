@@ -1,58 +1,66 @@
 package edu.calbaptist.bible_ly.ui.classes
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import edu.calbaptist.bible_ly.BoardRecycleViewItem
-import edu.calbaptist.bible_ly.Class
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.QuerySnapshot
+import edu.calbaptist.bible_ly.BiblelyClass
 import edu.calbaptist.bible_ly.Event
-import edu.calbaptist.bible_ly.Notification
-import edu.calbaptist.bible_ly.ui.board.getDaysAgo
-import java.util.*
+import edu.calbaptist.bible_ly.FirestoreRepository
+
 
 class ClassesViewModel : ViewModel() {
-
-/*
-
-    val classes = mutableListOf<Class>()
-    init {
-
-        for (i in 0 until 5) {
-            val event = Notification()
-            event.id = i
-            event.createdDate = getDaysAgo(i)
-            event.title = "Noti #$i"
-            event.description ="this is fun #$i"
+    val TAG = "ClassesViewModel"
+    var firebaseRepository = FirestoreRepository()
+    private var classesAsStudent : MutableLiveData<List<BiblelyClass>> = MutableLiveData()
+    var classesAsTeacher : MutableLiveData<List<BiblelyClass>> = MutableLiveData()
 
 
-            val temp = BoardRecycleViewItem(event.id, event.title,sdf.format(event.createdDate),
-                event.description,1)
+    fun getClassesAsStudent(): LiveData<List<BiblelyClass>> {
+        firebaseRepository.getClassesAsStudentQuery()
+            .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    classesAsStudent.value = null
+                    return@EventListener
+                }
 
-            boardRecycleViewItem+=(temp)
-        }
-        boardRecycleViewItem.sortBy { a->a.date }
-        for (i in 0 until 5) {
-            val event = Event()
-            event.eventID = i
-            event.endDate = Date()
-            event.startDate = getDaysAgo(i)
-            event.repeat = 0
-
-            event.name = "Event #$i"
-            event.description ="this is fun #$i"
-            //  saveEvent(event )
-            val temp = BoardRecycleViewItem(event.eventID, event.name,"${sdf.format(event.startDate)} - ${sdf.format(event.endDate)}",
-                event.className,0)
-
-            boardRecycleViewItem+=(temp)
-        }
+                var list: MutableList<BiblelyClass> = mutableListOf()
 
 
+                for (doc in value!!) {
+                    list.add(doc.toObject(BiblelyClass::class.java))
+                }
+                classesAsStudent.value = list
 
+            })
 
+        return classesAsStudent
     }
-*/
 
+    fun getClassesAsTeacher(): LiveData<List<BiblelyClass>> {
+        firebaseRepository.getClassesAsTeacherQuery()
+            .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    classesAsTeacher.value = null
+                    return@EventListener
+                }
+
+                var list: MutableList<BiblelyClass> = mutableListOf()
+
+
+                for (doc in value!!) {
+                    list.add(doc.toObject(BiblelyClass::class.java))
+                }
+                classesAsTeacher.value = list
+
+            })
+
+        return classesAsTeacher
+    }
 
 
 }

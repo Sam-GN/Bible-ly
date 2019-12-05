@@ -1,19 +1,25 @@
 package edu.calbaptist.bible_ly
 
-import android.app.Activity
-import android.app.TimePickerDialog
+import android.app.*
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Point
+import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
 import android.widget.*
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.content_class_single.*
 import java.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -53,34 +59,8 @@ fun getScaledBitmap(path: String, destWidth: Int, destHeight: Int): Bitmap {
 
     return BitmapFactory.decodeFile(path, options)
 }
-fun getUser(path:String,callback: (User) -> Unit){
-    FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
-        if (it != null) {
-            callback( it.toObject(User::class.java) as User)
-        }
-    }
-}
-fun getClass(path:String,callback: (Class) -> Unit){
-    FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
-        if (it != null) {
-            callback( it.toObject(Class::class.java) as Class)
-        }
-    }
-}
-fun getEvent(path:String,callback: (Event) -> Unit){
-    FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
-        if (it != null) {
-            callback( it.toObject(Event::class.java) as Event)
-        }
-    }
-}
-fun getVerse(path:String,callback: (Verse) -> Unit){
-    FirebaseFirestore.getInstance().document(path!!).get().addOnSuccessListener {
-        if (it != null) {
-            callback( it.toObject(Verse::class.java) as Verse)
-        }
-    }
-}
+
+
 fun ImageButton.setGlide(imagePath: String){
     if(imagePath!= "") {
         try {
@@ -108,7 +88,7 @@ fun ImageButton.setGlide(imagePath: String){
         this.setImageResource(R.mipmap.ic_launcher2_round)
     }
 }
-fun ImageView.setGlide(imagePath: String){
+fun ImageView.setGlide(imagePath: String,isRound:Boolean){
     if(imagePath!= "") {
         try {
             Glide.with(this.context)
@@ -122,9 +102,10 @@ fun ImageView.setGlide(imagePath: String){
                 .load(imagePath)
                 // .apply(RequestOptions().transforms(CenterCrop(), RoundedCorners(30)))
                 //.apply(RequestOptions.centerCropTransform())
-                .apply(RequestOptions.circleCropTransform())
+                .apply(if(isRound)RequestOptions.circleCropTransform()else RequestOptions.centerCropTransform())
 
                 .into(this)
+
 
         }catch (e: IOException){
             Log.e("BoardAdapter",e.message)
@@ -224,7 +205,95 @@ fun getTime(btn: Button, context: Context,cal: Calendar){
 
 
 }
-fun sendNotification(topic:String,title:String,message:String,context: Context ) {
+fun shareIntent(context: Context,text:String,subject:String,title: String) {
+    Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, text)
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+    }.also { intent ->
+        val chooserIntent = Intent.createChooser(intent, title)
+        context.startActivity(chooserIntent)
+    }
+}
+fun showNotification(context:Context, title: String, message: String, newComment:Boolean, param1:String, param2:String){
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val NOTIFICATION_CHANNEL_ID = "Nilesh_channel"
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val notificationChannel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            "Your Notifications",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        notificationChannel.description = "Description"
+        notificationChannel.enableLights(true)
+        notificationChannel.lightColor = Color.RED
+        notificationChannel.vibrationPattern = longArrayOf(0, 1000, 500, 1000)
+        notificationChannel.enableVibration(true)
+        notificationManager.createNotificationChannel(notificationChannel)
+    }
+
+
+    // to diaplay notification in DND Mode
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel =
+            notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID)
+        channel.canBypassDnd()
+    }
+
+
+    val notificationBuilder =
+        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+
+    notificationBuilder.setAutoCancel(true)
+        .setColor(ContextCompat.getColor(context, R.color.colorAccent))
+        .setContentTitle(title)
+        //.setContentText(remoteMessage!!.getNotification()!!.getBody())
+        .setContentText(message)
+        .setDefaults(android.app.Notification.DEFAULT_ALL)
+        .setWhen(System.currentTimeMillis())
+        .setSmallIcon(R.drawable.ic_launcher_background)
+        .setAutoCancel(true)
+
+    if(newComment) {
+        // Create an Intent for the activity you want to start
+        val resultIntent = Intent(context, MainActivity::class.java)
+        resultIntent.putExtra("currentDestination", R.id.nav_bible)
+        resultIntent.putExtra("noteID", param1)
+        // Create the TaskStackBuilder
+        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            // Add the intent, which inflates the back stack
+            addNextIntentWithParentStack(resultIntent)
+            // Get the PendingIntent containing the entire back stack
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        notificationBuilder.setContentIntent(resultPendingIntent)
+
+
+    }
+    else{
+        val resultIntent = Intent(context, MainActivity::class.java)
+        resultIntent.putExtra("currentDestination", R.id.nav_board)
+        resultIntent.putExtra("eventID", param1)
+        resultIntent.putExtra("classID", param2)
+        // Create the TaskStackBuilder
+        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            // Add the intent, which inflates the back stack
+            addNextIntentWithParentStack(resultIntent)
+            // Get the PendingIntent containing the entire back stack
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+        notificationBuilder.setContentIntent(resultPendingIntent)
+    }
+
+    notificationManager.notify(1000, notificationBuilder.build())
+
+
+
+}
+fun sendNotification(topic:String,title:String,message:String,context: Context,param1:String ) {
     val TAG = "sendNotification"
     val FCM_API = "https://fcm.googleapis.com/fcm/send"
     val serverKey = "key=" + "AAAA_Z8c2FM:APA91bFTvaDRR7T0VmD2NVKvmkUfWF5yU3ZFDsXsVUZnYD7wvHSk1rV3iU82kDd625Q5PKZDgYCWXpdsLN0tRkZePw00iu7ToIpD2Ixh5xYS6ku4uWSVqBhQ4H-lNURQZ-xSB9mz5vnK"
@@ -239,6 +308,7 @@ fun sendNotification(topic:String,title:String,message:String,context: Context )
         notifcationBody.put("title", title)
         notifcationBody.put("message", message)
         notifcationBody.put("topic", topic)
+        notifcationBody.put("param1", param1)
 
         notification.put("to", TOPIC)
         notification.put("data", notifcationBody)
@@ -262,30 +332,15 @@ fun sendNotification(topic:String,title:String,message:String,context: Context )
             return headers
         }
     }
-    // var jsonObjectRequest =  JsonObjectRequest("",notification,null,null)
-    /* var jsonObjectRequest =  JsonObjectRequest("FCM_API", notification,
-          Response.Listener<JSONObject>() {
-             @Override
-             void onResponse(JSONObject response) {
-                 Log.i(TAG, "onResponse: " + response.toString());
-                 edtTitle.setText("");
-                 edtMessage.setText("");
-             }
-         },
-         Response.ErrorListener() {
-             @Override
-             void onErrorResponse(VolleyError error) {
-                 Toast.makeText(MainActivity.this, "Request error", Toast.LENGTH_LONG).show();
-                 Log.i(TAG, "onErrorResponse: Didn't work");
-             }
-         }){
-         @Override
-         public Map<String, String> getHeaders() throws AuthFailureError {
-         Map<String, String> params = new HashMap<>();
-         params.put("Authorization", serverKey);
-         params.put("Content-Type", contentType);
-         return params;
-     }
-     };*/
+
     VolleySingleton.requestQueque.add(jsonObjectRequest)
 }
+fun getCurrentActivity(context:Context) :String{
+    var am =  context.getSystemService(ACTIVITY_SERVICE) as (ActivityManager)
+    var  taskInfo = am.getRunningTasks(1);
+    Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.className)
+    var componentInfo = taskInfo[0].topActivity
+    return  componentInfo.className
+}
+fun Int.toDp(displayMetrics: DisplayMetrics) = toFloat().toDp(displayMetrics).toInt()
+fun Float.toDp(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, displayMetrics)
