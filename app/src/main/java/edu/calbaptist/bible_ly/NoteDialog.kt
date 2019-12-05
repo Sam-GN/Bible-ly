@@ -39,6 +39,7 @@ import android.widget.LinearLayout
 private lateinit var note:Note
 private var notePath:String? = ""
 private var book:String? = ""
+private var bookTitle:String? = ""
 private var verseChapter:String? = ""
 private var verseNum:String? = ""
 private var verseText:String? = ""
@@ -134,6 +135,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
        // val rootView = inflater.inflate(R.layout.fraglayout, container)
         book = arguments?.getString("book")
+        bookTitle = arguments?.getString("bookTitle")
         verseChapter = arguments?.getString("verseChapter")
         verseNum = arguments?.getString("verseNum")
         verseText = arguments?.getString("verseText")
@@ -151,7 +153,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
     @SuppressLint("SetTextI18n")
     private fun updateui(){
 
-        myView.tv_note_frag_verse_num.text = "$book: Chapter $verseChapter - $verseNum"
+        myView.tv_note_frag_verse_num.text = "$bookTitle: Chapter $verseChapter - $verseNum"
         myView.tv_note_frag_verse_text.text = verseText
         myView.tv_note_frag_date.text = Date().toLocalDateString(false)
 
@@ -331,13 +333,14 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         return dialoge
     }
    companion object{
-       fun newInstance(isNew:Boolean,notePath:String,book:String,verseNum: String,verseChapter: String,verseText: String):DialogFragment{
+       fun newInstance(isNew:Boolean,notePath:String,book:String,verseNum: String,verseChapter: String,verseText: String,bookTitle:String):DialogFragment{
            MainActivity.currentNoteID = notePath
            val frag = NoteDialog()
            val args = Bundle()
            args.putBoolean("isNew", isNew)
            args.putString("notePath",notePath)
            args.putString("book",book)
+           args.putString("bookTitle",bookTitle)
            args.putString("verseNum",verseNum)
            args.putString("verseChapter",verseChapter)
            args.putString("verseText",verseText)

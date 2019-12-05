@@ -105,6 +105,14 @@ class FirestoreRepository {
             }
         }
     }
+    fun getBookName(bookNum:Int,callback: (String) -> Unit){
+        firestoreDB.collection("BibleKey").whereEqualTo("bookNumber",bookNum).get().addOnSuccessListener {querySnapShots ->
+
+            querySnapShots.forEach {bibleKeySnapshot->
+                callback( bibleKeySnapshot.toObject(BibleKey::class.java).name)
+            }
+        }
+    }
     fun joinClass(id:String,context: Context,dialoge:androidx.appcompat.app.AlertDialog,fab: FloatingActionsMenu){
 
         firestoreDB.collection("Class").get()

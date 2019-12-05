@@ -34,12 +34,7 @@ class BibleViewModel : ViewModel() {
 
             var list : MutableList<BibleKey> = mutableListOf()
             for (doc in value!!) {
-                var item = BibleKey(
-                    doc["bookNumber"].toString().toInt(),
-                    doc["genreId"].toString(),
-                    doc["name"].toString(),
-                    doc["testament"].toString()
-                )
+                var item = doc.toObject(BibleKey::class.java)
                 list.add(item)
             }
 
@@ -93,7 +88,7 @@ class BibleViewModel : ViewModel() {
                 list.add(item)
             }
             Log.d(TAG, "verses size: " + list.size.toString())
-            verses.value = list
+            verses.value = list.sortedBy { a->a.getVerseAsInt() }
         })
 
         return verses

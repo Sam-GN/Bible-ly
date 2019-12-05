@@ -64,9 +64,10 @@ data class BibleKey (
     val bookNumber: Int,
     val genreId: String,
     val name: String,
-    val testament: String
+    val testament: String,
+    val chapterCount:Int
 ) {
-    constructor() : this( 0,"","", "")
+    constructor() : this( 0,"","", "",0)
     fun getBibleKeyBookNumberAsInt():Int {
         return bookNumber.toInt()
     }

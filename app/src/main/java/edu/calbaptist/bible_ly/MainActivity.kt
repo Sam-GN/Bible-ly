@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             val personName = acct.displayName
             val personGivenName = acct.givenName
             val personFamilyName = acct.familyName
-            val personEmail = acct.email//+"1111"
+            val personEmail = acct.email +"1111"
             val personId = acct.id
             val personPhoto = acct.photoUrl
 
@@ -169,16 +169,20 @@ class MainActivity : AppCompatActivity() {
                 if(noteID!="") {
                     FirestoreRepository().getNote(noteID){ notee ->
                         var item = notee
-                        var d = NoteDialog.newInstance(
-                            false,
-                            noteID,
-                            item.book,
-                            item.verseNum,
-                            item.verseChapter,
-                            item.verseText
-                        )
-                        val fm = supportFragmentManager
-                        d.show(fm, "NoteDialog")
+                        FirestoreRepository().getBookName(item.book.toInt()){ bookName ->
+                            var d = NoteDialog.newInstance(
+                                false,
+                                noteID,
+                                item.book,
+                                item.verseNum,
+                                item.verseChapter,
+                                item.verseText,
+                                bookName
+                                )
+                            val fm = supportFragmentManager
+                            d.show(fm, "NoteDialog")
+                        }
+
                     }
 
                 }
