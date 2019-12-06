@@ -17,10 +17,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
+import androidx.navigation.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -30,6 +33,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+
+import edu.calbaptist.bible_ly.ui.bible.BibleFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_bible.*
 import org.jetbrains.anko.doAsync
@@ -159,15 +164,19 @@ class MainActivity : AppCompatActivity() {
             if (currentDestination == R.id.nav_classes) {
                 mainMenu?.getItem(0)?.isVisible = false
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
+                navController.navigate(currentDestination)
             }
             //when user clicks on new comment notification
             if (currentDestination == R.id.nav_bible) {
                 mainMenu?.getItem(0)?.isVisible = true
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                 drawer_layout.openDrawer(GravityCompat.END)
+
                 var noteID = bundle?.getString("noteID") ?: ""
                 if(noteID!="") {
                     FirestoreRepository().getNote(noteID){ notee ->
+                        var bundle = bundleOf("bookNum" to notee.book)
+                        navController.navigate(currentDestination,bundle)
                         var item = notee
                         FirestoreRepository().getBookName(item.book.toInt()){ bookName ->
                             var d = NoteDialog.newInstance(
@@ -198,8 +207,9 @@ class MainActivity : AppCompatActivity() {
                     val fm = supportFragmentManager
                     d.show(fm,"EventDialog")
                 }
+                navController.navigate(currentDestination)
             }
-            navController.navigate(currentDestination)
+
             navView.setNavigationItemSelectedListener { menuItem ->
                 when (menuItem.itemId) {
 
@@ -230,7 +240,8 @@ class MainActivity : AppCompatActivity() {
                         currentDestination = R.id.nav_classes
                     }
 
-                    R.id.nav_share -> { Toast.makeText(this,"For sharing Links",Toast.LENGTH_SHORT).show()
+                    R.id.nav_share -> { /*Toast.makeText(this,"For sharing Links",Toast.LENGTH_SHORT).show()*/
+                       // navController.navigate(R.id.nav_bible,bundle)
                     }
 
                 }
@@ -292,10 +303,11 @@ class MainActivity : AppCompatActivity() {
 
                     drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
 
-                    ll_bible_nav_notes_land.apply {
-                        when(visibility){
-                            View.GONE -> visibility = View.VISIBLE
-                            View.VISIBLE -> visibility = View.GONE
+                    var ll = findViewById<LinearLayout>(R.id.ll_bible_nav_notes_land)
+                        ll.let {
+                        when(it.visibility){
+                            View.GONE -> it.visibility = View.VISIBLE
+                            View.VISIBLE -> it.visibility = View.GONE
                         }  }
 
                 } else {
@@ -354,6 +366,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
 
+
+
         if( drawer_layout.isDrawerOpen(GravityCompat.START)){
             drawer_layout.closeDrawer(GravityCompat.START)
         } else if (drawer_layout.isDrawerOpen(GravityCompat.END)) {
@@ -362,10 +376,13 @@ class MainActivity : AppCompatActivity() {
             if(currentDestination == R.id.nav_board)
                 this.finish()
             else {
+
                 currentDestination = previousDestination
                 super.onBackPressed()
             }
+
         }
+
         //additional code
 
 

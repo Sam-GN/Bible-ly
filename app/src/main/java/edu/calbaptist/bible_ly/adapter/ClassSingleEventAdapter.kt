@@ -1,19 +1,15 @@
 package edu.calbaptist.bible_ly.adapter
 
 import android.content.DialogInterface
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import edu.calbaptist.bible_ly.*
 import kotlinx.android.synthetic.main.list_class_single_item_event.view.*
@@ -67,7 +63,6 @@ open class ClassSingleEventAdapter(query: Query, private val listener: OnClassSi
                 numRatings)
             itemView.restaurantItemPrice.text = RestaurantUtil.getPriceString(event)*/
 
-            Log.i("ClassSingleEventAdapter",event.name)
             itemView.tv_class_event_name.text = event.name
             itemView.tv_class_event_description.text = event.description
             itemView.tv_class_event_date.text = event.date!!.toLocalDateString(true)
@@ -95,13 +90,13 @@ open class ClassSingleEventAdapter(query: Query, private val listener: OnClassSi
 
                         var dialoge = AlertDialog.Builder(view.context)
                             .setCancelable(false)
-                            .setTitle("Are you sure you want to delete event?")
-                            .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                            .setTitle(R.string.delete_event)
+                            .setNegativeButton(R.string.no, DialogInterface.OnClickListener { dialog, which ->
                                 //Action goes here
                             })
-                            .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                            .setPositiveButton(R.string.yes, DialogInterface.OnClickListener { dialog, which ->
                                 snapshot.reference.delete()
-                                Toast.makeText(view.context,  "Event Deleted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(view.context,  R.string.event_deleted, Toast.LENGTH_SHORT).show()
                                // this.finish()
                             })
                             .create()

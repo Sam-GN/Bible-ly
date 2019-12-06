@@ -22,23 +22,40 @@ import kotlinx.android.synthetic.main.fragment_bible.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import android.widget.LinearLayout
+import kotlin.concurrent.thread
 
 public const val TAG = "BibleFragment"
 
+var selectedNote :NoteCardViewItem? = null
+
 class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedListener,
     BibleMutableListAdapter.OnBibleItemLongSelectedListener ,
-    NoteMutableListAdapter.OnNoteItemSelectedListener,NoteMutableListAdapter.OnNoteItemLongSelectedListener {
+    NoteMutableListAdapter.OnNoteItemSelectedListener,NoteMutableListAdapter.OnNoteItemLongSelectedListener,
+    NoteDialog.Callback{
+    override fun onDismissed(isRotating: Boolean) {
+        if(!isRotating){
+            selectedNote = null
+        }
+
+    }
+
+
     override fun onNoteItemLongSelected(v:View,item: NoteCardViewItem) {
         showNotePopup(v,item)
     }
 
     override fun onNoteItemSelected(item: NoteCardViewItem) {
 
+        selectedNote = item
 
+        NoteDialog.newInstance(false, item.noteID,item.book,item.verseNum,item.verseChapter,item.verseText,books[bookNum-1].name).apply {
+            setTargetFragment(this@BibleFragment, 0)
+            show(this@BibleFragment.requireFragmentManager(), "NoteDialog")
+        }
 
-        var d = NoteDialog.newInstance(false, item.noteID,item.book,item.verseNum,item.verseChapter,item.verseText,books[bookNum-1].name)
-        val fm = requireActivity().supportFragmentManager
-        d.show(fm,"NoteDialog")
+//        var d = NoteDialog.newInstance(false, item.noteID,item.book,item.verseNum,item.verseChapter,item.verseText,books[bookNum-1].name)
+//        val fm = requireActivity().supportFragmentManager
+//        d.show(fm,"NoteDialog")
     }
 
     override fun onBibleItemLongSelected(
@@ -145,10 +162,30 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         intent.putExtra("currentDestination", R.id.nav_bible)
         startActivity(intent)*/
         //this.finish()
-        fragmentManager!!.popBackStack()
+
+        if(selectedNote!=null){
+            doAsync {
+                Thread.sleep(200)
+                uiThread {
+                    NoteDialog.newInstance(false, selectedNote!!.noteID,selectedNote!!.book,selectedNote!!.verseNum,selectedNote!!.verseChapter,selectedNote!!.verseText,books[bookNum-1].name).apply {
+                        setTargetFragment(this@BibleFragment, 0)
+                        show(this@BibleFragment.requireFragmentManager(), "NoteDialog")
+                        fragmentManager!!.popBackStack()
+                    }
+
+                }
+            }
+        } else {
+            fragmentManager!!.popBackStack()
+        }
+
+
+
+        //
         MainActivity.navigateDrawer()
 
         super.onConfigurationChanged(newConfig)
+
         //initUI()
     }
 
@@ -176,6 +213,12 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        var bookNumBundle = arguments?.getString("bookNum") ?: ""
+
+        if(bookNumBundle!= ""){
+            bookNum = bookNumBundle.toInt()
+        }
 
 
         bibleViewModel =
@@ -219,13 +262,13 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         myRoot.ib_bible_next_chapter.setOnClickListener {
             if(chapter!=books[bookNum-1].chapterCount) {
                 chapter++
-                reloadChapter( chapter)
+                reloadChapter( 0)
             }
         }
         myRoot.ib_bible_previous_chapter.setOnClickListener {
             if(chapter!=1) {
                 chapter--
-                reloadChapter(chapter)
+                reloadChapter(0)
             }
         }
         myRoot.btn_bible_chapter.setOnClickListener {
@@ -267,9 +310,9 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         //adapter2.notifyDataSetChanged()
         ////noteRecyclerView.adapter = noteAdapter
     }
-    private fun reloadChapter( chapterNum: Int){
-        bibleViewModel.getVerses(bookNum.toString(), chapterNum.toString()).observe(this, Observer { list ->
-            reloadBible( list, 0) // note: always start with 1st verse
+    private fun reloadChapter(  verseNum: Int){
+        bibleViewModel.getVerses(bookNum.toString(), chapter.toString()).observe(this, Observer { list ->
+            reloadBible( list, verseNum) // note: always start with 1st verse
         })
 
         myRoot.btn_bible_chapter.text = "Chapter "+ chapter.toString()
@@ -281,7 +324,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 //            reloadBible( verses, 0) // note: always start at the beginning
 //        })
         chapter=1
-        reloadChapter(chapter)
+        reloadChapter(0)
         reloadNotes()
     }
     private fun reloadBible( verseList:List<Verse>, verseNum:Int){
@@ -337,7 +380,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         list.adapter = adapter
         list.setOnItemClickListener { parent, view, position, id ->
             chapter = position + 1
-            reloadChapter( chapter)
+            reloadChapter( 0)
             dialoge.dismiss()
         }
 
@@ -371,8 +414,6 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         dialoge.show()
     }
 
-    private val lastVisibleItemPosition: Int
-        get() = linearLayoutManager.findLastVisibleItemPosition()
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -394,5 +435,6 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         smoothScroller.targetPosition = position
         layoutManager?.startSmoothScroll(smoothScroller)
     }
+
 
 }

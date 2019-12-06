@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
@@ -23,17 +20,15 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.calbaptist.Comment_ly.adapter.CommentMutableListAdapter
 import edu.calbaptist.bible_ly.ui.bible.BibleViewModel
 import android.app.Activity
-import android.view.WindowManager
+import android.content.res.Configuration
+import android.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.text.FieldPosition
-import android.view.Gravity
 import android.widget.LinearLayout
-
-
-
-
-
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import edu.calbaptist.bible_ly.ui.bible.selectedNote
 
 
 private lateinit var note:Note
@@ -45,6 +40,7 @@ private var verseNum:String? = ""
 private var verseText:String? = ""
 private var isNew:Boolean? = true
 private lateinit var myView: View
+private var prevComment = ""
 
 private lateinit var noteDialogViewModel: NoteDialogViewModel
 
@@ -59,10 +55,10 @@ private var mapofClasses:Map<String,String>? = null
 
 class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreSelectedListener {
     override fun OnCommentItemMoreSelectedListener(v:View,item: CommentCardViewItem,position: Int) {
-        if(item.user!!.email == MainActivity.user.email){
-            currentItemPosition = position
-            showNotePopup(v,item)
-        }
+
+        currentItemPosition = position
+        showNotePopup(v,item)
+
     }
     override fun onDismiss(dialog: DialogInterface?) {
         super.onDismiss(dialog)
@@ -77,7 +73,9 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         popup = PopupMenu(view.context, view)
         popup.inflate(R.menu.menu_note_comment_item_more)
 
-
+        if(note.user!!.email == MainActivity.user.email && cmnt.user!!.email!=MainActivity.user.email){
+            popup.menu.removeItem(R.id.note_comment_more_edit)
+        }
 
 
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
@@ -131,8 +129,40 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
         popup.show()
     }
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    interface Callback {
+        fun onDismissed(isRotating:Boolean)
+    }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+//        val orientation = resources.configuration.orientation
+//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//
+//
+//        } else {
+//
+//
+//        }
+        super.onConfigurationChanged(newConfig)
 
+// var frg : Fragment? = null;
+//frg = fragmentManager!!.findFragmentByTag("NoteDialog");
+//var  ft : FragmentTransaction = fragmentManager!!.beginTransaction();
+//ft.detach(frg!!);
+//ft.attach(frg);
+//ft.commit();
+        //dialog.window.decorView.findViewById<View>(android.R.id.content).invalidate()
+
+        targetFragment?.let { fragment ->
+            (fragment as Callback).onDismissed(true)
+
+        }
+
+        dismiss()
+       // onCreateDialog(null)
+
+        //initUI()
+    }
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        retainInstance = true
        // val rootView = inflater.inflate(R.layout.fraglayout, container)
         book = arguments?.getString("book")
         bookTitle = arguments?.getString("bookTitle")
@@ -155,7 +185,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
         myView.tv_note_frag_verse_num.text = "$bookTitle: Chapter $verseChapter - $verseNum"
         myView.tv_note_frag_verse_text.text = verseText
-        myView.tv_note_frag_date.text = Date().toLocalDateString(false)
+        myView.tv_note_frag_date.text = note.date!!.toLocalDateString(false)
 
 
 
@@ -250,6 +280,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
             myView.ll_note_frag_comment.visibility = View.GONE
         }
         myView.ib_note_frag_send.setOnClickListener {
+            prevComment = myView.et_note_frag_comment_text.text.toString()
             if( myView.et_note_frag_comment_text.text.toString()!="") {
                 FirestoreRepository().addComment(
                     notePath!!,
@@ -260,7 +291,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                     sendNotification(
                         "SendToUser_" + note!!.user!!.email.replace("@", "_"),
                         "New Comment",
-                        myView.et_note_frag_comment_text.text.toString(),
+                        prevComment,
                         requireContext(),
                         note.noteID
                     )
@@ -272,7 +303,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                             sendNotification(
                                 "SendToUser_" + email.replace("@", "_"),
                                 "New Comment",
-                                myView.et_note_frag_comment_text.text.toString(),
+                                prevComment,
                                 requireContext(),
                                 note.noteID
                             )
@@ -281,6 +312,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                     }
                     // commentsRecyclerView.layoutManager!!.scrollToPosition(0)
                 }
+
                 myView.et_note_frag_comment_text.setText("")
                 currentItemPosition = 0
             }
@@ -299,7 +331,10 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         var dialogeBuilder = AlertDialog.Builder(requireContext(),R.style.full_screen_dialog)
            // .setTitle("New Event")
             .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
-                //Action goes here
+                targetFragment?.let { fragment ->
+                    (fragment as Callback).onDismissed(false)
+
+                }
             })
             .setPositiveButton("Save",DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
@@ -310,6 +345,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
 
         var dialoge = dialogeBuilder.create()
+
 
         dialoge.show()
         (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
@@ -325,11 +361,27 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                 notePath!!, myView.sw_note_frag_share.isChecked,
                 if( myView.sw_note_frag_share.isChecked)  mapofClasses!!.filterValues { it == myView.sp_note_frag_note_class.selectedItem.toString() }.keys.first() else ""
             )
+            targetFragment?.let { fragment ->
+                (fragment as Callback).onDismissed(false)
 
+            }
             dialoge.dismiss()
         }
         if(isNew!!)
             updateui()
+        dialoge.setOnKeyListener { dialog, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_BACK &&
+                event.action == KeyEvent.ACTION_UP
+            ) {
+                targetFragment?.let { fragment ->
+                    (fragment as Callback).onDismissed(false)
+
+                }
+
+                 true
+            }
+             false
+        }
         return dialoge
     }
    companion object{
@@ -347,5 +399,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
            frag.arguments = args
            return frag
        }
+
    }
+
 }

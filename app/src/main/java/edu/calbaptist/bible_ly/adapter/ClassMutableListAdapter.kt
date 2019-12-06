@@ -75,7 +75,6 @@ open class ClassMutableListAdapter (private val listener: OnBiblelyClassItemSele
                         .into(ivLogo)
 
                 }catch (e: IOException){
-                    Log.e("BoardAdapter",e.message)
                     ivLogo.setImageResource(R.drawable.ic_class_logo_default2)
                 }
 

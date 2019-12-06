@@ -53,14 +53,16 @@ open class CommentMutableListAdapter (private val listener: OnCommentItemMoreSel
             itemView.tv_note_comment_text.text = comment.text
             FirestoreRepository().getNote("Note/"+comment.path.split("/")[1]){
                 if(comment.user!!.email==MainActivity.user.email || it.user!!.email == MainActivity.user.email){
-                    itemView.tv_note_comment_user.text = "Me <${comment.userText}>:"
                     itemView.iv_note_comment_more.visibility = View.VISIBLE
                 }
                 else{
-                    itemView.tv_note_comment_user.text = comment.userText+":"
                     itemView.iv_note_comment_more.visibility = View.INVISIBLE
                 }
             }
+            if(comment.user!!.email==MainActivity.user.email)
+                itemView.tv_note_comment_user.text = "Me <${comment.userText}>:"
+            else
+                itemView.tv_note_comment_user.text = comment.userText+":"
 
             itemView.tv_note_comment_date.text = comment.date!!.toLocalDateString(true)
 

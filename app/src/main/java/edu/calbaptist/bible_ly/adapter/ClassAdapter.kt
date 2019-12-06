@@ -76,7 +76,7 @@ open class ClassAdapter (query: Query, private val listener: OnClassItemSelected
              itemView.restaurantItemPrice.text = RestaurantUtil.getPriceString(event)*/
 
 
-            Log.i("BoardAdapter",biblelyClass.name)
+
             var ivLogo = itemView.findViewById<ImageView>(R.id.iv_class_item_logo)
             if(biblelyClass.classLogo != "") {
                 try {
@@ -96,7 +96,6 @@ open class ClassAdapter (query: Query, private val listener: OnClassItemSelected
                         .into(ivLogo)
 
                 }catch (e: IOException){
-                    Log.e("BoardAdapter",e.message)
                     ivLogo.setImageResource(R.drawable.ic_class_logo_default2)
                 }
 
