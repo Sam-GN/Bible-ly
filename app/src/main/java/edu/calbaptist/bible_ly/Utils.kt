@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.graphics.Point
 import android.os.Build
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.TypedValue
 import android.widget.*
 import androidx.core.app.NotificationCompat
@@ -23,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import edu.calbaptist.bible_ly.activity.MainActivity
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException

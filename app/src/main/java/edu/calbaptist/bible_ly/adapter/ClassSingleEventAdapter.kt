@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
 import edu.calbaptist.bible_ly.*
+import edu.calbaptist.bible_ly.activity.MainActivity
 import kotlinx.android.synthetic.main.list_class_single_item_event.view.*
 
 

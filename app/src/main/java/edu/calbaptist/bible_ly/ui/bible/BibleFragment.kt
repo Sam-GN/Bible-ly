@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.calbaptist.Note_ly.adapter.NoteMutableListAdapter
 import edu.calbaptist.bible_ly.*
 import edu.calbaptist.bible_ly.adapter.BibleMutableListAdapter
+import edu.calbaptist.bible_ly.activity.MainActivity
+import edu.calbaptist.bible_ly.ui.notes.NoteDialog
 import kotlinx.android.synthetic.main.fragment_bible.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread

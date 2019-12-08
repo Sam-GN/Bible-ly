@@ -1,26 +1,12 @@
 package edu.calbaptist.bible_ly.ui.classes
 
-import android.annotation.TargetApi
-import android.app.Activity
-import android.content.ContentUris
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,26 +14,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.getbase.floatingactionbutton.FloatingActionsMenu.OnFloatingActionsMenuUpdateListener
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
 import edu.calbaptist.bible_ly.*
 import edu.calbaptist.bible_ly.R
-import edu.calbaptist.bible_ly.adapter.ClassAdapter
 import edu.calbaptist.bible_ly.adapter.ClassMutableListAdapter
 import kotlinx.android.synthetic.main.dialogue_join_class.view.*
-import kotlinx.android.synthetic.main.dialogue_new_class.view.*
 import kotlinx.android.synthetic.main.fragment_classes.*
 import kotlinx.android.synthetic.main.fragment_classes.view.*
-import java.util.*
-import kotlin.collections.ArrayList
 import androidx.lifecycle.Observer
+import edu.calbaptist.bible_ly.activity.ClassSingleActivity
+import edu.calbaptist.bible_ly.ui.dialoge.ClassDialog
 
 
-class ClassesFragment : Fragment(), ClassMutableListAdapter.OnBiblelyClassItemSelectedListener ,ClassDialog.Callback{
+class ClassesFragment : Fragment(), ClassMutableListAdapter.OnBiblelyClassItemSelectedListener ,
+    ClassDialog.Callback{
     override fun onClassCreated() {
         fab.collapse()
     }

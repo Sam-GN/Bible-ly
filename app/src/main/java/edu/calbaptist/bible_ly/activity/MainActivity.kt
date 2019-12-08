@@ -1,10 +1,9 @@
-package edu.calbaptist.bible_ly
+package edu.calbaptist.bible_ly.activity
 
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -20,11 +19,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
-import androidx.navigation.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -34,10 +31,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import edu.calbaptist.bible_ly.FirestoreRepository
+import edu.calbaptist.bible_ly.R
+import edu.calbaptist.bible_ly.User
+import edu.calbaptist.bible_ly.ui.event.EventDialog
 
-import edu.calbaptist.bible_ly.ui.bible.BibleFragment
+import edu.calbaptist.bible_ly.ui.notes.NoteDialog
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_bible.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -75,7 +75,8 @@ class MainActivity : AppCompatActivity() {
         currentDestination = bundle?.getInt("currentDestination") ?: R.id.nav_board
 
         if(currentDestination == 0)
-            currentDestination = R.id.nav_board
+            currentDestination =
+                R.id.nav_board
 
         var db = FirebaseFirestore.getInstance()
         val settings = FirebaseFirestoreSettings.Builder()
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             val personName = acct.displayName
             val personGivenName = acct.givenName
             val personFamilyName = acct.familyName
-            val personEmail = acct.email //+"1111"
+            val personEmail = acct.email// +"1111"
             val personId = acct.id
             val personPhoto = acct.photoUrl
 
@@ -115,15 +116,22 @@ class MainActivity : AppCompatActivity() {
             val usersRef = firestore.collection("User").document(personEmail!!)
             /*   // Add restaurant
                batch.set(eventRef, event)*/
-            user = User(personName!!,personGivenName!!,personFamilyName!!,personEmail,personPhoto.toString()!!)
-            usersRef.set( user)
+            user =
+                User(
+                    personName!!,
+                    personGivenName!!,
+                    personFamilyName!!,
+                    personEmail,
+                    personPhoto.toString()!!
+                )
+            usersRef.set(user)
             FirebaseMessaging.getInstance().subscribeToTopic("SendToUser_"+personEmail.replace("@","_"))
         }
 
 
 
 
-        drawerLayout  = findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         navView  = findViewById(R.id.nav_view)
 //        navView.setNavigationItemSelectedListener{ menuItem ->
 //            if(menuItem.itemId == R.id.nav_share)
@@ -136,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 //
 //            true
 //        }
-        navView2  = findViewById(R.id.nav_view2)
+        navView2 = findViewById(R.id.nav_view2)
         navController = findNavController(R.id.nav_host_fragment)
 
 
@@ -161,9 +169,9 @@ class MainActivity : AppCompatActivity() {
             signOut()
         }
         updateNavHeader()
-        //Toast.makeText(this, bundle?.getInt("currentDestination").toString(),Toast.LENGTH_SHORT).show()
 
-        if(currentDestination!=0) {
+
+        if(currentDestination !=0) {
 
             if (currentDestination == R.id.nav_classes) {
                 mainMenu?.getItem(0)?.isVisible = false
@@ -182,7 +190,8 @@ class MainActivity : AppCompatActivity() {
                         var bundle = bundleOf("bookNum" to notee.book)
                         navController.navigate(currentDestination,bundle)
                         var item = notee
-                        FirestoreRepository().getBookName(item.book.toInt()){ bookName ->
+                        FirestoreRepository()
+                            .getBookName(item.book.toInt()){ bookName ->
                             var d = NoteDialog.newInstance(
                                 false,
                                 noteID,
@@ -213,7 +222,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 navController.navigate(currentDestination)
             }
-            //Toast.makeText(this,"tyty",Toast.LENGTH_SHORT).show()
+
             nav_view.setNavigationItemSelectedListener { menuItem ->
 
 
@@ -225,8 +234,10 @@ class MainActivity : AppCompatActivity() {
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = false
 //                        Toast.makeText(this,mainMenu?.getItem(0)?.isVisible.toString(),Toast.LENGTH_SHORT).show()
-                        previousDestination = currentDestination
-                        currentDestination = R.id.nav_board
+                        previousDestination =
+                            currentDestination
+                        currentDestination =
+                            R.id.nav_board
                     }
 
                     R.id.nav_bible -> {
@@ -235,8 +246,10 @@ class MainActivity : AppCompatActivity() {
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = true
 //                      Toast.makeText(this,mainMenu?.getItem(0)?.isVisible.toString(),Toast.LENGTH_SHORT).show()
-                        previousDestination = currentDestination
-                        currentDestination = R.id.nav_bible
+                        previousDestination =
+                            currentDestination
+                        currentDestination =
+                            R.id.nav_bible
                     }
 
                     R.id.nav_classes -> {
@@ -245,8 +258,10 @@ class MainActivity : AppCompatActivity() {
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = false
 //                        Toast.makeText(this,mainMenu?.getItem(0)?.isVisible.toString(),Toast.LENGTH_SHORT).show()
-                        previousDestination = currentDestination
-                        currentDestination = R.id.nav_classes
+                        previousDestination =
+                            currentDestination
+                        currentDestination =
+                            R.id.nav_classes
                     }
 
                     R.id.nav_share -> { /*Toast.makeText(this,"For sharing Links",Toast.LENGTH_SHORT).show()*/
@@ -277,7 +292,7 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
        mainMenu = menu
-       if(currentDestination!=R.id.nav_bible)
+       if(currentDestination != R.id.nav_bible)
             menu.getItem(0).isVisible = false
     /*    if (currentDestination ==  R.id.nav_bible)
             menu.removeItem(R.id.action_settings)*/
@@ -354,7 +369,7 @@ class MainActivity : AppCompatActivity() {
         fun getLaunchIntent(from: Context) = Intent(from, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
-        lateinit var user:User
+        lateinit var user: User
          ////var mainMenu: Menu? = null
         lateinit var navView2: NavigationView
         lateinit var drawerLayout: DrawerLayout
@@ -386,7 +401,8 @@ class MainActivity : AppCompatActivity() {
                 this.finish()
             else {
 
-                currentDestination = previousDestination
+                currentDestination =
+                    previousDestination
                 super.onBackPressed()
             }
 

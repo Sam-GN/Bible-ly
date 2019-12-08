@@ -1,4 +1,4 @@
-package edu.calbaptist.bible_ly
+package edu.calbaptist.bible_ly.ui.notes
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -7,34 +7,23 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.event_detailed_fragment.view.*
-import kotlinx.android.synthetic.main.list_bible_item.view.*
 import kotlinx.android.synthetic.main.note_detailed_fragment.view.*
 import java.util.*
-import android.widget.AdapterView
-import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.calbaptist.Comment_ly.adapter.CommentMutableListAdapter
-import edu.calbaptist.bible_ly.ui.bible.BibleViewModel
-import android.app.Activity
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.util.DisplayMetrics
 import android.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.text.FieldPosition
 import android.widget.LinearLayout
-import androidx.core.view.marginStart
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import edu.calbaptist.bible_ly.ui.bible.selectedNote
+import edu.calbaptist.bible_ly.*
+import edu.calbaptist.bible_ly.activity.MainActivity
 
 
-private lateinit var note:Note
+private lateinit var note: Note
 private var notePath:String? = ""
 private var book:String? = ""
 private var bookTitle:String? = ""
@@ -53,7 +42,7 @@ var currentItemPosition =0
 private var mapofClasses:Map<String,String>? = null
 
 class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreSelectedListener {
-    override fun OnCommentItemMoreSelectedListener(v:View,item: CommentCardViewItem,position: Int) {
+    override fun OnCommentItemMoreSelectedListener(v:View, item: CommentCardViewItem, position: Int) {
 
         currentItemPosition = position
         showNotePopup(v,item)
@@ -63,17 +52,17 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         super.onDismiss(dialog)
         MainActivity.currentNoteID = ""
     }
-    private fun showNotePopup(view: View,cmnt :CommentCardViewItem) {
+    private fun showNotePopup(view: View,cmnt : CommentCardViewItem) {
         var popup: PopupMenu?
         popup = PopupMenu(view.context, view)
         popup.inflate(R.menu.menu_note_comment_item_more)
-        if(note.user!!.email == MainActivity.user.email && cmnt.user!!.email!=MainActivity.user.email){
+        if(note.user!!.email == MainActivity.user.email && cmnt.user!!.email!= MainActivity.user.email){
             popup.menu.removeItem(R.id.note_comment_more_edit)
         }
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
 
             when (item!!.itemId) {
-                R.id.note_comment_more_edit-> {
+                R.id.note_comment_more_edit -> {
                     val ll = LinearLayout(context)
                     val et = EditText(context)
                     val param = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
@@ -101,7 +90,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
 
 
-                R.id.note_comment_more_delete-> {
+                R.id.note_comment_more_delete -> {
                     val dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
                         .setTitle(getString(R.string.comment_delete_title))
@@ -161,13 +150,16 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
     @SuppressLint("SetTextI18n")
     private fun updateui(){
 
-        myView.tv_note_frag_verse_num.text = "$bookTitle:"+getString(R.string.chapter) +"$verseChapter - $verseNum"
-        myView.tv_note_frag_verse_text.text = verseText
+        myView.tv_note_frag_verse_num.text = "$bookTitle:"+getString(
+            R.string.chapter
+        ) +"$verseChapter - $verseNum"
+        myView.tv_note_frag_verse_text.text =
+            verseText
         myView.tv_note_frag_date.text = (if(isNew!!) Date() else note.date!!).toLocalDateString(false)
 
 
 
-        myView.sw_note_frag_share.setOnCheckedChangeListener{_,isChecked ->
+        myView.sw_note_frag_share.setOnCheckedChangeListener{ _, isChecked ->
             if(!isChecked){
                 myView.sp_note_frag_note_class.visibility = View.GONE
             }
@@ -204,11 +196,15 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                 ViewModelProviders.of(this).get(NoteDialogViewModel::class.java)
 
 
-            commentsRecyclerView = myView.findViewById(R.id.rv_note_comments)
+            commentsRecyclerView = myView.findViewById(
+                R.id.rv_note_comments
+            )
             linearLayoutManager = LinearLayoutManager(context)
-            commentsRecyclerView.layoutManager = linearLayoutManager
-            adapter= CommentMutableListAdapter(this)
-            commentsRecyclerView.adapter = adapter
+            commentsRecyclerView.layoutManager =
+                linearLayoutManager
+            adapter = CommentMutableListAdapter(this)
+            commentsRecyclerView.adapter =
+                adapter
 
             noteDialogViewModel.getComments(notePath!!).observe(this, androidx.lifecycle.Observer {
                 list ->
@@ -224,14 +220,24 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                                 map[cmnt.user!!.email] = getString(R.string.user)+" ${++i}"
 
                         }
-                        list2.add(0,CommentCardViewItem(cmnt.path,map[cmnt.user!!.email]!!,cmnt.user!!,cmnt.text,cmnt.date))
+                        list2.add(0,
+                            CommentCardViewItem(
+                                cmnt.path,
+                                map[cmnt.user!!.email]!!,
+                                cmnt.user!!,
+                                cmnt.text,
+                                cmnt.date
+                            )
+                        )
                     }
                     adapter.submitList(list2)
                     if(list.isNotEmpty()){
                         doAsync {
                             Thread.sleep(200)
                             uiThread {
-                                commentsRecyclerView.layoutManager!!.scrollToPosition(currentItemPosition)
+                                commentsRecyclerView.layoutManager!!.scrollToPosition(
+                                    currentItemPosition
+                                )
                             }
                          }
                     }
@@ -267,7 +273,10 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                 //send notification to the note's creator
                 if (note!!.user!!.email != MainActivity.user.email)
                     sendNotification(
-                        "SendToUser_" + note!!.user!!.email.replace("@", "_"),
+                        "SendToUser_" + note!!.user!!.email.replace(
+                            "@",
+                            "_"
+                        ),
                         getString(R.string.comment_new),
                         prevComment,
                         requireContext(),
@@ -275,7 +284,8 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                     )
 
                 //send notification to every body in a note's comments section
-                FirestoreRepository().getCommentInvolvedUsers(note!!.noteID) { involvedUserEmailList ->
+                FirestoreRepository()
+                    .getCommentInvolvedUsers(note!!.noteID) { involvedUserEmailList ->
                     involvedUserEmailList.forEach { email ->
                         if (email != MainActivity.user.email && note!!.user!!.email != email)
                             sendNotification(
@@ -298,7 +308,9 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
     private fun createDialog():Dialog{
       val  view =LayoutInflater.from(requireContext()).inflate(R.layout.note_detailed_fragment, null)
         myView = view
-        var dialogeBuilder = AlertDialog.Builder(requireContext(),R.style.full_screen_dialog)
+        var dialogeBuilder = AlertDialog.Builder(requireContext(),
+            R.style.full_screen_dialog
+        )
            // .setTitle("New Event")
             .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                 targetFragment?.let { fragment ->
@@ -322,7 +334,8 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
             }
 
             FirestoreRepository().saveNote(
-                isNew!!,book!!, verseNum!!, verseChapter!!, verseText!!
+                isNew!!,
+                book!!, verseNum!!, verseChapter!!, verseText!!
                 , myView.et_note_frag_note.text.toString(), myView.et_note_frag_title.text.toString(),
                 notePath!!, myView.sw_note_frag_share.isChecked,
                 if( myView.sw_note_frag_share.isChecked)  mapofClasses!!.filterValues { it == myView.sp_note_frag_note_class.selectedItem.toString() }.keys.first() else ""

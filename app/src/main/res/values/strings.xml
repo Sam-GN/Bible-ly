@@ -109,6 +109,9 @@ You will be removed from the class</string>
 
     <string name="chapterNum">Chapter%s</string>
 
+    <string name="notification_new_event">New Event</string>
+    <string name="notification_new_event_text">Event %s created</string>
+
 
 
     <string name="menu_board">Board</string>

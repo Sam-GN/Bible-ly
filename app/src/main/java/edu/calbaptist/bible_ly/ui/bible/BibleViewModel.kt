@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.QuerySnapshot
 import edu.calbaptist.bible_ly.*
+import edu.calbaptist.bible_ly.activity.MainActivity
 
 class BibleViewModel : ViewModel() {
     private var firebaseRepository = FirestoreRepository()

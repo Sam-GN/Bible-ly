@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.calbaptist.bible_ly.*
 import edu.calbaptist.bible_ly.adapter.EventMutableListAdapter
+import edu.calbaptist.bible_ly.ui.event.EventDialog
 import kotlinx.android.synthetic.main.fragment_board.*
 
 

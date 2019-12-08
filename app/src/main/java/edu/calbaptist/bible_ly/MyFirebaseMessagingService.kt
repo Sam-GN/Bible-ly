@@ -1,18 +1,11 @@
 package edu.calbaptist.bible_ly
 
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.graphics.Color
-import android.os.Build
-import android.widget.Toast
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import edu.calbaptist.bible_ly.activity.MainActivity
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
