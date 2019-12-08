@@ -42,19 +42,15 @@ private var verseChapter:String? = ""
 private var verseNum:String? = ""
 private var verseText:String? = ""
 private var isNew:Boolean? = true
+@SuppressLint("StaticFieldLeak")
 private lateinit var myView: View
 private var prevComment = ""
-
 private lateinit var noteDialogViewModel: NoteDialogViewModel
-
 private lateinit var commentsRecyclerView: RecyclerView
 lateinit var linearLayoutManager: LinearLayoutManager
 lateinit var adapter: CommentMutableListAdapter
 var currentItemPosition =0
-
-
 private var mapofClasses:Map<String,String>? = null
-
 
 class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreSelectedListener {
     override fun OnCommentItemMoreSelectedListener(v:View,item: CommentCardViewItem,position: Int) {
@@ -65,36 +61,27 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
     }
     override fun onDismiss(dialog: DialogInterface?) {
         super.onDismiss(dialog)
-//        val activity = activity
-//        if (activity is DialogInterface.OnDismissListener) {
-//            (activity as DialogInterface.OnDismissListener).onDismiss(dialog)
-//        }
         MainActivity.currentNoteID = ""
     }
     private fun showNotePopup(view: View,cmnt :CommentCardViewItem) {
-        var popup: PopupMenu? = null;
+        var popup: PopupMenu?
         popup = PopupMenu(view.context, view)
         popup.inflate(R.menu.menu_note_comment_item_more)
-
         if(note.user!!.email == MainActivity.user.email && cmnt.user!!.email!=MainActivity.user.email){
             popup.menu.removeItem(R.id.note_comment_more_edit)
         }
-
-
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
 
             when (item!!.itemId) {
-
                 R.id.note_comment_more_edit-> {
-                    var ll = LinearLayout(context)
-
-                    var et = EditText(context)
-                    var param = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
+                    val ll = LinearLayout(context)
+                    val et = EditText(context)
+                    val param = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
                     param.setMargins(10.toDp(Resources.getSystem().displayMetrics),0,10.toDp(Resources.getSystem().displayMetrics),0)
                     et.layoutParams =param
                     ll.addView(et)
                     et.setText(cmnt.text)
-                    var dialoge = AlertDialog.Builder(requireContext())
+                    val dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
                         .setTitle(getString(R.string.comment_dialog_title))
                         .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
@@ -115,7 +102,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
 
                 R.id.note_comment_more_delete-> {
-                    var dialoge = AlertDialog.Builder(requireContext())
+                    val dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
                         .setTitle(getString(R.string.comment_delete_title))
                         .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
@@ -142,23 +129,8 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         fun onDismissed(isRotating:Boolean)
     }
     override fun onConfigurationChanged(newConfig: Configuration) {
-//        val orientation = resources.configuration.orientation
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//
-//
-//        } else {
-//
-//
-//        }
-        super.onConfigurationChanged(newConfig)
 
-// var frg : Fragment? = null;
-//frg = fragmentManager!!.findFragmentByTag("NoteDialog");
-//var  ft : FragmentTransaction = fragmentManager!!.beginTransaction();
-//ft.detach(frg!!);
-//ft.attach(frg);
-//ft.commit();
-        //dialog.window.decorView.findViewById<View>(android.R.id.content).invalidate()
+        super.onConfigurationChanged(newConfig)
 
         targetFragment?.let { fragment ->
             (fragment as Callback).onDismissed(true)
@@ -166,13 +138,10 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         }
 
         dismiss()
-       // onCreateDialog(null)
 
-        //initUI()
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         retainInstance = true
-       // val rootView = inflater.inflate(R.layout.fraglayout, container)
         book = arguments?.getString("book")
         bookTitle = arguments?.getString("bookTitle")
         verseChapter = arguments?.getString("verseChapter")
@@ -194,7 +163,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
         myView.tv_note_frag_verse_num.text = "$bookTitle:"+getString(R.string.chapter) +"$verseChapter - $verseNum"
         myView.tv_note_frag_verse_text.text = verseText
-        myView.tv_note_frag_date.text = note.date!!.toLocalDateString(false)
+        myView.tv_note_frag_date.text = (if(isNew!!) Date() else note.date!!).toLocalDateString(false)
 
 
 
@@ -319,7 +288,6 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
 
                     }
-                    // commentsRecyclerView.layoutManager!!.scrollToPosition(0)
                 }
 
                 myView.et_note_frag_comment_text.setText("")
@@ -330,13 +298,6 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
     private fun createDialog():Dialog{
       val  view =LayoutInflater.from(requireContext()).inflate(R.layout.note_detailed_fragment, null)
         myView = view
-   //     val view = layoutInflater.inflate(R.layout.event_detailed_fragment, null)
-//        val lptv = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-//        myView.layoutParams = lptv
-
-
-
-
         var dialogeBuilder = AlertDialog.Builder(requireContext(),R.style.full_screen_dialog)
            // .setTitle("New Event")
             .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
@@ -351,10 +312,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
            .setCancelable(false)
             .setView(view)//.create()
 
-
-
         var dialoge = dialogeBuilder.create()
-
 
         dialoge.show()
         (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
@@ -362,7 +320,6 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                 Toast.makeText(requireContext(), getString(R.string.note_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
 
             FirestoreRepository().saveNote(
                 isNew!!,book!!, verseNum!!, verseChapter!!, verseText!!

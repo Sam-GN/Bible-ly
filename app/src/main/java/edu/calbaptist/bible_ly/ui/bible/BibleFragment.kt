@@ -1,10 +1,8 @@
 package edu.calbaptist.bible_ly.ui.bible
 
-import android.content.DialogInterface
-import android.content.Intent
+
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -21,10 +19,7 @@ import edu.calbaptist.bible_ly.adapter.BibleMutableListAdapter
 import kotlinx.android.synthetic.main.fragment_bible.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import android.widget.LinearLayout
-import kotlin.concurrent.thread
 
-public const val TAG = "BibleFragment"
 
 var selectedNote :NoteCardViewItem? = null
 
@@ -32,30 +27,42 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
     BibleMutableListAdapter.OnBibleItemLongSelectedListener ,
     NoteMutableListAdapter.OnNoteItemSelectedListener,NoteMutableListAdapter.OnNoteItemLongSelectedListener,
     NoteDialog.Callback{
+
+    private lateinit var bibleViewModel: BibleViewModel
+
+    private lateinit var bibleRecyclerView: RecyclerView
+    private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var adapter: BibleMutableListAdapter
+
+    private lateinit var noteRecyclerView: RecyclerView
+    private lateinit var noteLinearLayoutManager: LinearLayoutManager
+    private lateinit var noteAdapter: NoteMutableListAdapter
+    private lateinit var noNoteTV: TextView
+
+    var chapter = 1
+    private var bookNum = 1
+
+    private var books = listOf<BibleKey>()
+    private var allNotes = listOf<NoteCardViewItem>()
+    private lateinit var myRoot:View
+
+
     override fun onDismissed(isRotating: Boolean) {
         if(!isRotating){
             selectedNote = null
         }
-
     }
-
 
     override fun onNoteItemLongSelected(v:View,item: NoteCardViewItem) {
         showNotePopup(v,item)
     }
 
     override fun onNoteItemSelected(item: NoteCardViewItem) {
-
         selectedNote = item
-
         NoteDialog.newInstance(false, item.noteID,item.book,item.verseNum,item.verseChapter,item.verseText,books[bookNum-1].name).apply {
             setTargetFragment(this@BibleFragment, 0)
             show(this@BibleFragment.requireFragmentManager(), "NoteDialog")
         }
-
-//        var d = NoteDialog.newInstance(false, item.noteID,item.book,item.verseNum,item.verseChapter,item.verseText,books[bookNum-1].name)
-//        val fm = requireActivity().supportFragmentManager
-//        d.show(fm,"NoteDialog")
     }
 
     override fun onBibleItemLongSelected(
@@ -65,35 +72,28 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         verseChapter: String,
         verseText: String
     ) {
-        showPopup(v,book,verseNum,verseChapter,verseText)
+        showBiblePopup(v,book,verseNum,verseChapter,verseText)
     }
 
 
-    private fun showPopup(view: View,book:String,verseNum: String,
-                          verseChapter: String,
-                          verseText: String) {
-        var popup: PopupMenu? = null;
+    private fun showBiblePopup(view: View, book:String, verseNum: String,
+                               verseChapter: String,
+                               verseText: String) {
+        val popup: PopupMenu?
         popup = PopupMenu(view.context, view)
         popup.inflate(R.menu.menu_bible_item_more)
-
-
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
 
             when (item!!.itemId) {
                 R.id.bible_verse_add_note-> {
-                    var d = NoteDialog.newInstance(true, "",book,verseNum,verseChapter,verseText,books[bookNum-1].name)
+                    val d = NoteDialog.newInstance(true, "",book,verseNum,verseChapter,verseText,books[bookNum-1].name)
                     val fm = requireActivity().supportFragmentManager
                     d.show(fm,"NoteDialog")
                 }
                 R.id.bible_verse_share ->{
-                    Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT,"${books[bookNum].name}: ${getString(R.string.chapter)}:$verseChapter-${getString(R.string.verse)}: $verseNum\n" +
-                                "$verseText")
-                        putExtra(Intent.EXTRA_SUBJECT, "")
-                    }.also { intent -> val chooserIntent = Intent.createChooser(intent,getString(R.string.share_verse))
-                        startActivity(chooserIntent)
-                    }
+                    shareIntent(requireContext(),"${books[bookNum].name}: ${getString(R.string.chapter)}:$verseChapter-${getString(R.string.verse)}: $verseNum\n$verseText",
+                        "",getString(R.string.share_verse))
+
                 }
 
             }
@@ -105,14 +105,13 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
     }
 
     private fun showNotePopup(view: View,note :NoteCardViewItem) {
-        var popup: PopupMenu? = null;
+        val popup: PopupMenu?
         popup = PopupMenu(view.context, view)
         popup.inflate(R.menu.menu_bible_note_item_more)
 
         if(note.shared&& note.user!!.email != MainActivity.user.email){
             popup.menu.removeItem(R.id.bible_note_delete_note)
         }
-
 
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
 
@@ -125,26 +124,20 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
                     MainActivity.drawerLayout.closeDrawer(GravityCompat.END)
 
                 }
-
-
-
                 R.id.bible_note_delete_note-> {
-                    var dialoge = AlertDialog.Builder(requireContext())
+                    val dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
                         .setTitle(getString(R.string.delete_note_title))
-                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
-                            //Action goes here
-                        })
-                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
+                        .setNegativeButton(getString(R.string.no)) { _, _ ->
+
+                        }
+                        .setPositiveButton(getString(R.string.yes)) { _, _ ->
                             FirestoreRepository().deleteNote(note.noteID)
-
-                        })
+                        }
                         .create()
-
                     dialoge.show()
 
                 }
-
             }
 
             true
@@ -157,13 +150,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
     }
     override fun onConfigurationChanged(newConfig: Configuration) {
-        //(findViewById(R.id.webviewPlace) as LinearLayout).removeAllViews()
-        /*val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.putExtra("currentDestination", R.id.nav_bible)
-        startActivity(intent)*/
-        //this.finish()
-
-        if(selectedNote!=null){
+       if(selectedNote!=null){
             doAsync {
                 Thread.sleep(200)
                 uiThread {
@@ -172,41 +159,16 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
                         show(this@BibleFragment.requireFragmentManager(), "NoteDialog")
                         fragmentManager!!.popBackStack()
                     }
-
                 }
             }
         } else {
             fragmentManager!!.popBackStack()
         }
-
-
-
-        //
         MainActivity.navigateDrawer()
-
         super.onConfigurationChanged(newConfig)
-
-        //initUI()
     }
 
 
-    private lateinit var bibleViewModel: BibleViewModel
-
-    private lateinit var bibleRecyclerView: RecyclerView
-    lateinit var linearLayoutManager: LinearLayoutManager
-    lateinit var adapter: BibleMutableListAdapter
-
-    private lateinit var noteRecyclerView: RecyclerView
-    lateinit var noteLinearLayoutManager: LinearLayoutManager
-    lateinit var noteAdapter: NoteMutableListAdapter
-    lateinit var noNoteTV: TextView
-
-    var chapter = 1
-    var bookNum = 1
-
-    var books = listOf<BibleKey>()
-    var allNotes = listOf<NoteCardViewItem>()
-    lateinit var myRoot:View
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -214,7 +176,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         savedInstanceState: Bundle?
     ): View? {
 
-        var bookNumBundle = arguments?.getString("bookNum") ?: ""
+        val bookNumBundle = arguments?.getString("bookNum") ?: ""
 
         if(bookNumBundle!= ""){
             bookNum = bookNumBundle.toInt()
@@ -244,12 +206,9 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         noteRecyclerView.layoutManager = noteLinearLayoutManager
         noteAdapter= NoteMutableListAdapter(this,this)
         noteRecyclerView.adapter = noteAdapter
-//        val textView: TextView = root.findViewById(R.id.text_slideshow)
-//        bibleViewModel.text.observe(this, Observer {
-//            textView.text = it
-//        })
-        reloadBook() // Note: this initializes the bible with book 1 chapter 1
-        //reloadChapter(1, 0)
+
+        reloadBook()
+
 
         bibleViewModel.getNotes().observe(this, Observer {list ->
 
@@ -258,9 +217,8 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
 
         })
-        setRecyclerViewScrollListener()
         myRoot.ib_bible_next_chapter.setOnClickListener {
-            if(chapter!=books[bookNum-1].chapterCount) {
+            if(books.isNotEmpty() && chapter!=books[bookNum-1].chapterCount) {
                 chapter++
                 reloadChapter( 0)
             }
@@ -279,16 +237,14 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
         }
         bibleViewModel.getBibleKeys().observe(this, Observer {books ->
             this.books = books
-            myRoot.btn_bible_book.text = books[bookNum -1].name //"Book "+ book.toString()
+            myRoot.btn_bible_book.text = books[bookNum -1].name
         })
 
         return myRoot
     }
     private fun reloadNotes(){
-        if(allNotes==null)
-            allNotes = listOf()
-        var list = allNotes.filter { note -> note.book == bookNum.toString() }
-        var list2 = mutableListOf<NoteCardViewItem>()
+        val list = allNotes.filter { note -> note.book == bookNum.toString() }
+        val list2 = mutableListOf<NoteCardViewItem>()
         if(list.isEmpty()){
             noNoteTV.visibility=View.VISIBLE
             noteRecyclerView.visibility =View.GONE
@@ -297,7 +253,6 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
             noteRecyclerView.visibility=View.VISIBLE
         }
         var chapter = ""
-
         for (note in  list.sortedBy { a -> a.verseChapter}){
             if(chapter != note.verseChapter){
                 list2.add(note.copy(isHeader = true))
@@ -305,80 +260,56 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
             }
             list2.add(note.copy(isHeader = false))
         }
-
         noteAdapter.submitList(list2)
-        //adapter2.notifyDataSetChanged()
-        ////noteRecyclerView.adapter = noteAdapter
     }
     private fun reloadChapter(  verseNum: Int){
         bibleViewModel.getVerses(bookNum.toString(), chapter.toString()).observe(this, Observer { list ->
-            reloadBible( list, verseNum) // note: always start with 1st verse
+            reloadBible( list, verseNum)
         })
-
-        myRoot.btn_bible_chapter.text = "Chapter "+ chapter.toString()
+        myRoot.btn_bible_chapter.text = getString(R.string.note_chapter_num,chapter.toString()) .replace(":","")
     }
     private fun reloadBook(){
         if(books.isNotEmpty())
             myRoot.btn_bible_book.text = books[bookNum -1].name
-//        bibleViewModel.getVerses(bookNum.toString(),"1").observe(this, Observer { verses ->
-//            reloadBible( verses, 0) // note: always start at the beginning
-//        })
         chapter=1
         reloadChapter(0)
         reloadNotes()
     }
-    private fun reloadBible( verseList:List<Verse>, verseNum:Int){
-        //Toast.makeText(requireContext(),eventList.size.toString(), Toast.LENGTH_SHORT).show()
+    private fun reloadBible( verseList:List<Verse>, verseNum:Int) {
         adapter.submitList(verseList)
-        //adapter2.notifyDataSetChanged()
         bibleRecyclerView.adapter = adapter
 
-
         doAsync {
-            //Execute all the long running tasks here
-                try {
-                    Thread.sleep(400)
-                    uiThread {
-                        bibleRecyclerView.smoothSnapToPosition(verseNum)
-                    }
-                }catch (e: InterruptedException) {
-                    // do something if thread doesn't work
+            try {
+                Thread.sleep(400)
+                uiThread {
+                    bibleRecyclerView.smoothSnapToPosition(verseNum)
                 }
+            } catch (e: InterruptedException) {
 
             }
-
-
+        }
     }
-    private fun setRecyclerViewScrollListener() {
-        bibleRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                val totalItemCount = recyclerView.layoutManager!!.itemCount
 
-                 //  Toast.makeText(requireContext(),newState.toString(),Toast.LENGTH_LONG).show()
-
-            }
-        })
-    }
 
     private fun selectChapterDialog(){
 
-        var dialoge = AlertDialog.Builder(requireContext())
+        val dialoge = AlertDialog.Builder(requireContext())
             .setCancelable(false)
             .setTitle(getString(R.string.select_chapter))
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
-                //Action goes here
-            })
+            .setNegativeButton(getString(R.string.close)) { _, _ ->
+
+            }
             .create()
 
-        var listItems = mutableListOf<String>() // bibleViewModel.verses.value!! //.distinctBy { it.chapter }
+        val listItems = mutableListOf<String>()
         for (i in 1..books[bookNum-1].chapterCount)
             listItems.add(getString(R.string.chapter)+" "+ i)
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItems)
-        var list = ListView(requireContext())
+        val list = ListView(requireContext())
         list.adapter = adapter
-        list.setOnItemClickListener { parent, view, position, id ->
+        list.setOnItemClickListener { _, _, position, _ ->
             chapter = position + 1
             reloadChapter( 0)
             dialoge.dismiss()
@@ -390,39 +321,35 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
     private fun selectBookDialog() {
 
-        var dialoge = AlertDialog.Builder(requireContext())
+        val dialoge = AlertDialog.Builder(requireContext())
             .setCancelable(false)
             .setTitle(getString(R.string.select_book))
-            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
-                //Action goes here
-            })
+            .setNegativeButton(getString(R.string.close)) { _, _ ->
+
+            }
             .create()
 
         // NOTE: hardcoded to only get first 19 books. We don't have the rest of the bible in firebase
-        var listItems = books.filter { it.bookNumber <= 19 }.map { it.name }
+        val listItems = books.filter { it.bookNumber <= 19 }.map { it.name }
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItems)
-        var list = ListView(requireContext())
+        val list = ListView(requireContext())
         list.adapter = adapter
-        list.setOnItemClickListener { parent, view, position, id ->
+        list.setOnItemClickListener { _, _, position, _ ->
             bookNum = position + 1
             reloadBook()
             dialoge.dismiss()
         }
-
         dialoge.setView(list)
         dialoge.show()
     }
 
-
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main, menu);
-
+        inflater.inflate(R.menu.main, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    fun RecyclerView.smoothSnapToPosition(position: Int, snapMode: Int = LinearSmoothScroller.SNAP_TO_START) {
+    private fun RecyclerView.smoothSnapToPosition(position: Int, snapMode: Int = LinearSmoothScroller.SNAP_TO_START) {
         val smoothScroller = object: LinearSmoothScroller(this.context) {
             override fun getVerticalSnapPreference(): Int {
                 return snapMode
