@@ -1,26 +1,17 @@
 package edu.calbaptist.bible_ly.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import edu.calbaptist.bible_ly.User
-import edu.calbaptist.bible_ly.Event
-import edu.calbaptist.bible_ly.MainActivity
 import edu.calbaptist.bible_ly.R
 import kotlinx.android.synthetic.main.list_class_single_item_student.view.*
-import kotlinx.android.synthetic.main.list_event_item_board.view.*
 import java.io.IOException
 
 
@@ -82,7 +73,6 @@ open class StudentAdapter (query: Query, private val listener: OnStudentItemSele
                         .into(ivLogo)
 
                 }catch (e: IOException){
-                    Log.e("BoardAdapter",e.message)
                     ivLogo.setImageResource(R.mipmap.ic_launcher2_round)
                 }
 

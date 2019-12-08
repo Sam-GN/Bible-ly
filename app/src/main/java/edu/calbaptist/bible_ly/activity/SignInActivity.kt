@@ -1,10 +1,8 @@
-package edu.calbaptist.bible_ly
+package edu.calbaptist.bible_ly.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings.Global.getString
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -16,6 +14,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import edu.calbaptist.bible_ly.R
 
 private const val TAG = "SignInActivity"
 
@@ -49,7 +48,7 @@ class SignInActivity : AppCompatActivity() {
                     throw ApiException(error("data is null"))
                 }
             } catch (e: ApiException) {
-                Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getText(R.string.sign_in_fail), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -58,7 +57,6 @@ class SignInActivity : AppCompatActivity() {
      * Avoid signing in if the user is already signed in
      */
     override fun onStart() {
-        Log.d(TAG, "onStart")
         super.onStart()
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
@@ -93,7 +91,7 @@ class SignInActivity : AppCompatActivity() {
 
                 startActivity(MainActivity.getLaunchIntent(this))
             } else {
-                Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.sign_in_fail), Toast.LENGTH_LONG).show()
             }
         }
     }

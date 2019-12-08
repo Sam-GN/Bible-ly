@@ -18,7 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="There are no events"/>
+        android:text="@string/no_events"/>
 
   <!--  <Button
         android:id="@+id/button"

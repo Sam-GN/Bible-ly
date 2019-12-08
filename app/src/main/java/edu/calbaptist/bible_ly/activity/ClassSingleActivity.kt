@@ -1,10 +1,9 @@
-package edu.calbaptist.bible_ly
+package edu.calbaptist.bible_ly.activity
 
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,9 +19,12 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
+import edu.calbaptist.bible_ly.*
+import edu.calbaptist.bible_ly.R
 import edu.calbaptist.bible_ly.adapter.ClassSingleEventAdapter
+import edu.calbaptist.bible_ly.ui.dialoge.ClassDialog
+import edu.calbaptist.bible_ly.ui.dialoge.StudentDialog
+import edu.calbaptist.bible_ly.ui.event.EventDialog
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -46,7 +48,8 @@ private var mmenu: Menu? = null
 class ClassSingleActivity : AppCompatActivity()
     , StudentAdapter.OnStudentItemSelectedListener
     , StudentAdapter.OnMoreItemSelectedListener
-    , ClassSingleEventAdapter.OnClassSingleEventItemSelectedListener ,ClassDialog.Callback {
+    , ClassSingleEventAdapter.OnClassSingleEventItemSelectedListener ,
+    ClassDialog.Callback {
     override fun onClassCreated() {
         reload()
     }
@@ -70,14 +73,15 @@ class ClassSingleActivity : AppCompatActivity()
 
                     var dialoge = AlertDialog.Builder(view.context)
                         .setCancelable(false)
-                        .setTitle("Are you sure you want to remove the student?")
-                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.remove_student))
+                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
                             //Action goes here
                         })
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                             val biblelyStudent = snapshot.toObject(User::class.java)
-                            FirestoreRepository().removeStudentFromClass(classID,biblelyStudent!!.email)
-                            Toast.makeText(view.context, "Student Removed", Toast.LENGTH_SHORT)
+                            FirestoreRepository()
+                                .removeStudentFromClass(classID,biblelyStudent!!.email)
+                            Toast.makeText(view.context, getString(R.string.student_removed), Toast.LENGTH_SHORT)
                                 .show()
 
                         })
@@ -90,18 +94,18 @@ class ClassSingleActivity : AppCompatActivity()
 
                    var tv = TextView(this)
                     tv.setPadding(10.toDp(Resources.getSystem().displayMetrics),10.toDp(Resources.getSystem().displayMetrics),0,0)
-                    tv.text = "Are you sure you want to promote this student to teacher?\n" +
-                            "You will be removed from the class"
+                    tv.text = getString(R.string.promote_student)
                     var dialoge = AlertDialog.Builder(view.context)
                         .setCancelable(false)
-                        .setTitle("Caution")
-                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.caution))
+                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
 
                         })
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                             val biblelyStudent = snapshot.toObject(User::class.java)
-                            FirestoreRepository().promoteStudentAsTeacher(classID,biblelyStudent!!)
-                            Toast.makeText(view.context, "Student Promoted", Toast.LENGTH_SHORT)
+                            FirestoreRepository().promoteStudentAsTeacher(
+                                classID,biblelyStudent!!)
+                            Toast.makeText(view.context, getString(R.string.student_promoted), Toast.LENGTH_SHORT)
                                 .show()
                            returnToMainActivity()
                         })
@@ -118,13 +122,16 @@ class ClassSingleActivity : AppCompatActivity()
 
     override fun onClassSingleEventItemSelected(ClassSingleEventItem: DocumentSnapshot) {
         var d =
-            EventDialog.newInstance(false, iAmTeacher, classID, ClassSingleEventItem.reference.path)
+            EventDialog.newInstance(false,
+                iAmTeacher,
+                classID, ClassSingleEventItem.reference.path)
         val fm = supportFragmentManager
         d.show(fm, "EventDialog")
     }
 
     override fun onStudentItemSelected(StudentItem: DocumentSnapshot) {
-        var d = StudentDialog.newInstance(StudentItem.reference.path)
+        var d =
+            StudentDialog.newInstance(StudentItem.reference.path)
         val fm = supportFragmentManager
         d.show(fm, "StudentDialog")
     }
@@ -144,14 +151,16 @@ class ClassSingleActivity : AppCompatActivity()
         reload()
         iv_class_single_teacher.setOnClickListener {
 
-            var d = StudentDialog.newInstance("User/" + classs!!.teacher!!.email)
+            var d =
+                StudentDialog.newInstance("User/" + classs!!.teacher!!.email)
             val fm = supportFragmentManager
             d.show(fm, "StudentDialog")
         }
 
         tv_class_single_teacher.setOnClickListener {
 
-            var d = StudentDialog.newInstance("User/" + classs!!.teacher!!.email)
+            var d =
+                StudentDialog.newInstance("User/" + classs!!.teacher!!.email)
             val fm = supportFragmentManager
             d.show(fm, "StudentDialog")
         }
@@ -162,9 +171,9 @@ class ClassSingleActivity : AppCompatActivity()
                     if (t.user!!.email == MainActivity.user.email && t.expireDate!!.after(a.toDate())) {
                         shareIntent(
                             this,
-                            "Join Bible-ly with Token: " + t.id,
-                            "Join Bible-ly BiblelyClass",
-                            "Invite with token: " + t.id
+                            getString(R.string.share_text) + " " + t.id,
+                            getString(R.string.share_subject),
+                            getString(R.string.share_title) + " " + t.id
                         )
                         return@getServerTimeStamp
                     }
@@ -175,12 +184,13 @@ class ClassSingleActivity : AppCompatActivity()
                     UUID.randomUUID().toString().substring(0, 8),
                     MainActivity.user
                 )
-                FirestoreRepository().updateClassToken(classID, t)
+                FirestoreRepository()
+                    .updateClassToken(classID, t)
                 shareIntent(
                     this,
-                    "Join Bible-ly with Token: " + t.id,
-                    "Join Bible-ly BiblelyClass",
-                    "Invite with token: " + t.id
+                    getString(R.string.share_text) + " " + t.id,
+                    getString(R.string.share_subject),
+                    getString(R.string.share_title) + " " + t.id
                 )
 
             }
@@ -209,7 +219,8 @@ class ClassSingleActivity : AppCompatActivity()
             this,
             LinearLayoutManager.HORIZONTAL, false
         )
-        studentRecycleView.layoutManager = studentLinearLayoutManager
+        studentRecycleView.layoutManager =
+            studentLinearLayoutManager
 
 
         studentAdapter = object : StudentAdapter(
@@ -226,12 +237,14 @@ class ClassSingleActivity : AppCompatActivity()
             }
         }
 
-        studentRecycleView.adapter = studentAdapter
+        studentRecycleView.adapter =
+            studentAdapter
 
 
         eventRecycleView = findViewById(R.id.rv_class_single_events)
         eventLinearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        eventRecycleView.layoutManager = eventLinearLayoutManager
+        eventRecycleView.layoutManager =
+            eventLinearLayoutManager
 
 
 
@@ -239,7 +252,9 @@ class ClassSingleActivity : AppCompatActivity()
 
         btn_class_single_new_event.setOnClickListener {
 
-            var d = EventDialog.newInstance(true, iAmTeacher, classID, "")
+            var d = EventDialog.newInstance(true,
+                iAmTeacher,
+                classID, "")
             val fm = supportFragmentManager
             d.show(fm, "EventDialog")
         }
@@ -247,7 +262,8 @@ class ClassSingleActivity : AppCompatActivity()
     }
 
     private fun reload() {
-        FirestoreRepository().getClass(classID) {
+        FirestoreRepository()
+            .getClass(classID) {
             classs = it
             tv_class_single_teacher.text = classs!!.teacher!!.userName
             tv_class_single_description.text = classs!!.description
@@ -291,10 +307,11 @@ class ClassSingleActivity : AppCompatActivity()
                 }
 
                 override fun onError(e: FirebaseFirestoreException) {
-                    Log.e("ClassFragment", e.message)
+
                 }
             }
-            eventRecycleView.adapter = eventAdapter
+            eventRecycleView.adapter =
+                eventAdapter
             eventAdapter!!.startListening()
         }
 
@@ -332,7 +349,10 @@ class ClassSingleActivity : AppCompatActivity()
                     ft.remove(prev)
                 }
 
-                var d = ClassDialog.newInstance(false, classID)
+                var d = ClassDialog.newInstance(
+                    false,
+                    classID
+                )
                 ft.addToBackStack(null)
                 d.show(ft, "dialog")
             }
@@ -340,19 +360,20 @@ class ClassSingleActivity : AppCompatActivity()
 
                 var dialoge = AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setTitle("Are you sure you want to delete this class?")
-                    .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                    .setTitle(getString(R.string.delete_class))
+                    .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
                         //Action goes here
                     })
-                    .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
-                        FirestoreRepository().deleteClass(classs!!.classID) {
+                    .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
+                        FirestoreRepository()
+                            .deleteClass(classs!!.classID) {
                             if (it) {
-                                Toast.makeText(this, "Class deleted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.class_deleted), Toast.LENGTH_SHORT).show()
                                 returnToMainActivity()
                             } else
                                 Toast.makeText(
                                     this,
-                                    "You can only delete empty classes",
+                                    getString(R.string.class_delete_failed),
                                     Toast.LENGTH_SHORT
                                 ).show()
                         }
@@ -364,12 +385,13 @@ class ClassSingleActivity : AppCompatActivity()
 
                 var dialoge = AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setTitle("Are you sure you want to leave?")
-                    .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                    .setTitle(getString(R.string.leave_class))
+                    .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
 
                     })
-                    .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
-                        FirestoreRepository().leaveClass(classID)
+                    .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
+                        FirestoreRepository()
+                            .leaveClass(classID)
                         returnToMainActivity()
                     })
                     .create()

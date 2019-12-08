@@ -1,6 +1,5 @@
 package edu.calbaptist.bible_ly
 
-import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
@@ -14,12 +13,8 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import kotlinx.android.synthetic.main.dialogue_join_class.view.*
-import kotlinx.android.synthetic.main.dialogue_new_class.view.*
-import kotlinx.android.synthetic.main.event_detailed_fragment.view.*
-import kotlinx.android.synthetic.main.note_detailed_fragment.view.*
+import edu.calbaptist.bible_ly.activity.MainActivity
 import java.util.*
-import kotlin.collections.ArrayList
 
 class FirestoreRepository {
 
@@ -45,7 +40,7 @@ class FirestoreRepository {
     }
     fun getClassesAsTeacherQuery(): Query {
         return firestoreDB.collection("Class")
-            .whereEqualTo("teacher.email",MainActivity.user.email)
+            .whereEqualTo("teacher.email", MainActivity.user.email)
     }
     fun getVersesQuery(book: String, chapter: String): Query {
 
@@ -128,7 +123,7 @@ class FirestoreRepository {
                                 if (t.id == id) {
 
                                     if(c!!.teacher!!.email == MainActivity.user.email){
-                                        Toast.makeText(context,"You can't join a class you teach",Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context,context.getString(R.string.class_join_failed),Toast.LENGTH_LONG).show()
                                         return@getServerTimeStamp
                                     }
 
@@ -142,7 +137,8 @@ class FirestoreRepository {
                                                 if(documents.isEmpty){
                                                     firestoreDB
                                                         .document(clss.reference.path)
-                                                        .collection("students").document().set(MainActivity.user)
+                                                        .collection("students").document().set(
+                                                            MainActivity.user)
                                                     firestoreDB.collection("User")
                                                         .document(MainActivity.user.email)
                                                         .collection("classes").document().set(c)
@@ -150,7 +146,7 @@ class FirestoreRepository {
                                                     )
                                                 }
                                                 else{
-                                                    Toast.makeText(context,"You are already in this class",Toast.LENGTH_LONG).show()
+                                                    Toast.makeText(context,context.getString(R.string.already_in_class),Toast.LENGTH_LONG).show()
 //                                                            firestoreDB
 //                                                                .document(clss.reference.path)
 //                                                                .collection("students").document().set(MainActivity.user)
@@ -163,7 +159,7 @@ class FirestoreRepository {
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "Token Expired.",
+                                            context.getString(R.string.token_expired),
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }
@@ -176,7 +172,7 @@ class FirestoreRepository {
                         }
                         Toast.makeText(
                             context,
-                            "Invalid Token.",
+                            context.getString(R.string.token_invalid),
                             Toast.LENGTH_LONG
                         ).show()
 

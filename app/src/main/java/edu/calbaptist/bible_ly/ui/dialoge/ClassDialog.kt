@@ -1,4 +1,4 @@
-package edu.calbaptist.bible_ly
+package edu.calbaptist.bible_ly.ui.dialoge
 
 import android.annotation.TargetApi
 import android.app.Activity
@@ -17,36 +17,26 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.DatePicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import edu.calbaptist.bible_ly.BiblelyClass
+import edu.calbaptist.bible_ly.FirestoreRepository
+import edu.calbaptist.bible_ly.R
 
-import com.google.android.gms.tasks.Continuation
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
-import edu.calbaptist.bible_ly.ui.classes.ClassesFragment
-import kotlinx.android.synthetic.main.activity_class_single.*
-import kotlinx.android.synthetic.main.dialogue_new_class.*
+import edu.calbaptist.bible_ly.activity.MainActivity
 import kotlinx.android.synthetic.main.dialogue_new_class.view.*
-import kotlinx.android.synthetic.main.event_detailed_fragment.view.*
-import java.util.*
 
 private const val DIALOG_CLASS = "DialogDate"
 private const val FINAL_CHOOSE_PHOTO = 122
 
 
-private lateinit var clss:BiblelyClass
+private lateinit var clss: BiblelyClass
 private var classPath:String? = ""
 private var isNew:Boolean? = true
 private lateinit var dialogView: View
@@ -75,7 +65,8 @@ class ClassDialog: DialogFragment(){
         isNew = arguments?.getBoolean("isNew")
 
         if(!isNew!!){
-            FirestoreRepository().getClass(classPath!!){
+            FirestoreRepository()
+                .getClass(classPath!!){
                 clss = it
                 updateui()
                 mListener = activity as Callback?
@@ -159,10 +150,12 @@ class ClassDialog: DialogFragment(){
         var dialogeBuilder =AlertDialog.Builder(requireActivity())
             .setCancelable(false)
             .setIcon(android.R.drawable.ic_dialog_alert)
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
 
             })
-            .setPositiveButton(if(isNew!!){"Create"}else{"Save"}, DialogInterface.OnClickListener { dialog, which ->
+            .setPositiveButton(if(isNew!!){getString(R.string.create)}else{getString(
+                R.string.save
+            )}, DialogInterface.OnClickListener { dialog, which ->
 
                 if(isNew!!) {
                     FirestoreRepository().saveClass(
@@ -211,7 +204,7 @@ class ClassDialog: DialogFragment(){
                     openAlbum()
                 }
                 else {
-                    Toast.makeText(requireContext(), "You denied the permission", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
                 }
         }
     }
@@ -280,13 +273,16 @@ class ClassDialog: DialogFragment(){
     private fun displayImage(imagePath: String?,uri: Uri){
         if (imagePath != null) {
             val bitmap = BitmapFactory.decodeFile(imagePath)
-            dialogView.ib_class_new_classLogo?.setImageBitmap(Bitmap.createScaledBitmap(bitmap,dialogView.ib_class_new_classLogo.width,dialogView.ib_class_new_classLogo.height,false))
+            dialogView.ib_class_new_classLogo?.setImageBitmap(Bitmap.createScaledBitmap(bitmap,
+                dialogView.ib_class_new_classLogo.width,
+                dialogView.ib_class_new_classLogo.height,false))
             dialogView.iv_class_new_deleteLogo.visibility = View.VISIBLE
             this.uri = uri
 
         }
         else {
-            Toast.makeText(requireContext(), "Failed to get image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                R.string.failed_get_image, Toast.LENGTH_SHORT).show()
         }
     }
 

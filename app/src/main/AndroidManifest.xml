@@ -15,23 +15,23 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ClassSingleActivity"
+            android:name="edu.calbaptist.bible_ly.activity.ClassSingleActivity"
             android:label="@string/title_activity_class_single"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="edu.calbaptist.bible_ly.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.calbaptist.bible_ly.MainActivity" />
+                android:value="edu.calbaptist.bible_ly.activity.MainActivity" />
         </activity>
-        <activity android:name=".SignInActivity"
+        <activity android:name="edu.calbaptist.bible_ly.activity.SignInActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="orientation|screenSize">
 
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="edu.calbaptist.bible_ly.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan"

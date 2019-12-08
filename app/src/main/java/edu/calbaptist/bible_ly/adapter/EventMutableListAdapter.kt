@@ -91,7 +91,7 @@ open class EventMutableListAdapter (private val listener: OnEventItemSelectedLis
                 numRatings)
             itemView.restaurantItemPrice.text = RestaurantUtil.getPriceString(event)*/
 
-            Log.i("BoardAdapter",event.name)
+
             itemView.notification_title.text = event.name
             itemView.notification_date.text = event.date!!.toLocalDateString(true)
             itemView.notification_class.text = event.clss!!.name

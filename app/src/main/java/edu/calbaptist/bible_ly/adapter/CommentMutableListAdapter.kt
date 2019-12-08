@@ -1,15 +1,13 @@
 package edu.calbaptist.Comment_ly.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.calbaptist.bible_ly.*
-import kotlinx.android.synthetic.main.list_bible_note_item.view.*
+import edu.calbaptist.bible_ly.activity.MainActivity
 import kotlinx.android.synthetic.main.list_comment_item.view.*
 
 
@@ -52,15 +50,17 @@ open class CommentMutableListAdapter (private val listener: OnCommentItemMoreSel
 
             itemView.tv_note_comment_text.text = comment.text
             FirestoreRepository().getNote("Note/"+comment.path.split("/")[1]){
-                if(comment.user!!.email==MainActivity.user.email || it.user!!.email == MainActivity.user.email){
-                    itemView.tv_note_comment_user.text = "Me <${comment.userText}>:"
+                if(comment.user!!.email== MainActivity.user.email || it.user!!.email == MainActivity.user.email){
                     itemView.iv_note_comment_more.visibility = View.VISIBLE
                 }
                 else{
-                    itemView.tv_note_comment_user.text = comment.userText+":"
                     itemView.iv_note_comment_more.visibility = View.INVISIBLE
                 }
             }
+            if(comment.user!!.email== MainActivity.user.email)
+                itemView.tv_note_comment_user.text = "Me <${comment.userText}>:"
+            else
+                itemView.tv_note_comment_user.text = comment.userText+":"
 
             itemView.tv_note_comment_date.text = comment.date!!.toLocalDateString(true)
 

@@ -26,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/class_frag_teacher_recycleView"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Classes you teach:"
+        android:text="@string/classes_as_teacher"
         android:labelFor="@+id/class_frag_teacher_recycleView"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -51,7 +51,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/class_frag_student_recycleView"
         app:layout_constraintTop_toBottomOf="@id/class_frag_teacher_recycleView"
-        android:text="Classes you are enrolled in:"
+        android:text="@string/classes_as_student"
         android:labelFor="@+id/class_frag_student_recycleView"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -110,7 +110,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="You have no classes. Use the + button to add new classes"
+        android:text="@string/no_classes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/class_frag_student_recycleView"

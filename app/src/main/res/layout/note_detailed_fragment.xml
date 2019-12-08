@@ -20,14 +20,14 @@
             android:id="@+id/tv_note_frag_verse_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="verse"
+            android:text="@string/verse"
             android:paddingEnd="8dp"
             />
     <TextView
         android:id="@+id/tv_note_frag_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Date" />
+        android:text="@string/date" />
 
 
 
