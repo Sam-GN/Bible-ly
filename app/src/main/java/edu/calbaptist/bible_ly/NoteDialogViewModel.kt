@@ -25,7 +25,6 @@ val TAG = "FIRESTORE_VIEW_MODEL"
     fun getComments(notePath:String): LiveData<List<Comment>>{
         firebaseRepository.getCommentsQuery(notePath).addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
                 comments.value = null
                 return@EventListener
             }

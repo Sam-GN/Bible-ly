@@ -19,7 +19,6 @@ class BorardViewModel : ViewModel() {
     fun getEvents(): LiveData<List<Event>>{
         firebaseRepository.getEventsQuery().addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
                 events.value = null
                 return@EventListener
             }

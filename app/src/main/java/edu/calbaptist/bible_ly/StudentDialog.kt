@@ -63,7 +63,7 @@ class StudentDialog: DialogFragment() {
         var dialogeBuilder = AlertDialog.Builder(requireContext())
            // .setTitle("New Event")
 
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
             })
            .setCancelable(false)

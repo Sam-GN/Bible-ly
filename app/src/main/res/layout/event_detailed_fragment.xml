@@ -16,7 +16,7 @@
         android:id="@+id/tf_event_frag_className"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Class name">
+        android:hint="@string/class_name">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:id="@+id/et_event_frag_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Title"/>
+            android:hint="@string/title"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -40,13 +40,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:labelFor="@+id/btn_event_frag_date"
-        android:text="Date"
+        android:text="@string/date"
         android:layout_marginTop="5dp"/>
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_event_frag_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pick date" />
+        android:text="@string/pick_date" />
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -57,7 +57,7 @@
             android:id="@+id/et_event_frag_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description"/>
+            android:hint="@string/description"/>
 
 
 

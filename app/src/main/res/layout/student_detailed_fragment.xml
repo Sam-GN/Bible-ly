@@ -21,7 +21,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Username"
+            android:text="@string/username"
             android:labelFor="@+id/tv_student_frag_username"
             android:layout_marginTop="10dp"/>
 
@@ -29,7 +29,7 @@
             android:id="@+id/tv_student_frag_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text=""
             android:textSize="17sp"/>
 
     <LinearLayout
@@ -45,14 +45,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Name"
+                android:text="@string/name"
                 android:labelFor="@+id/tv_student_frag_name"/>
 
             <TextView
                 android:id="@+id/tv_student_frag_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Name"
+                android:text="@string/name"
                 android:textSize="17sp"/>
         </LinearLayout>
 
@@ -64,14 +64,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Last Name"
+                android:text="@string/last_name"
                 android:labelFor="@+id/tv_student_frag_lastname"/>
 
             <TextView
                 android:id="@+id/tv_student_frag_lastname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Last Name"
+                android:text="@string/last_name"
                 android:textSize="17sp"/>
     </LinearLayout>
 
@@ -99,7 +99,7 @@
                 android:id="@+id/tv_student_frag_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Email"
+                android:text="@string/email"
                 android:textSize="17sp" />
 
         </LinearLayout>

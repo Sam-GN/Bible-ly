@@ -27,7 +27,6 @@ class BibleViewModel : ViewModel() {
     fun getBibleKeys(): LiveData<List<BibleKey>>{
         firebaseRepository.getBibleKeysQuery().addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
                 books.value = null
                 return@EventListener
             }
@@ -47,7 +46,6 @@ class BibleViewModel : ViewModel() {
     fun getBibleBook(book:String): LiveData<Bible> {
         firebaseRepository.getBookQuery(book).addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
                 bible.value = null
                 verses.value = null
                 return@EventListener
@@ -66,7 +64,7 @@ class BibleViewModel : ViewModel() {
                 list.add(item)
             }
 
-            Log.d(TAG, "chapter size: " + numOfChapters.toString())
+            //Log.d(TAG, "chapter size: " + numOfChapters.toString())
             bible.value = Bible(numOfChapters, list)
             verses.value = list
         })
@@ -77,7 +75,6 @@ class BibleViewModel : ViewModel() {
     fun getVerses(book:String, chapter:String): LiveData<List<Verse>>{
         firebaseRepository.getVersesQuery(book,chapter).addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
             if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
                 verses.value = null
                 return@EventListener
             }
@@ -87,7 +84,7 @@ class BibleViewModel : ViewModel() {
                 var item = doc.toObject(Verse::class.java)
                 list.add(item)
             }
-            Log.d(TAG, "verses size: " + list.size.toString())
+            //Log.d(TAG, "verses size: " + list.size.toString())
             verses.value = list.sortedBy { a->a.getVerseAsInt() }
         })
 
@@ -97,7 +94,6 @@ class BibleViewModel : ViewModel() {
         firebaseRepository.getNotesQuery()
             .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
                 if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
                     notes.value = null
                     return@EventListener
                 }
@@ -122,7 +118,6 @@ class BibleViewModel : ViewModel() {
                 firebaseRepository.getNotesShareQuery(aa.key)
                     .addSnapshotListener(EventListener<QuerySnapshot> { value2, e ->
                         if (e != null) {
-                            Log.w(TAG, "Listen failed.", e)
                             notes.value = null
                             return@EventListener
                         }

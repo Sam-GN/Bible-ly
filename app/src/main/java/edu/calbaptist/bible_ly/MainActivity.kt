@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -71,8 +72,10 @@ class MainActivity : AppCompatActivity() {
         var bundle: Bundle? = intent.extras
 
 
-
         currentDestination = bundle?.getInt("currentDestination") ?: R.id.nav_board
+
+        if(currentDestination == 0)
+            currentDestination = R.id.nav_board
 
         var db = FirebaseFirestore.getInstance()
         val settings = FirebaseFirestoreSettings.Builder()
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             val personName = acct.displayName
             val personGivenName = acct.givenName
             val personFamilyName = acct.familyName
-            val personEmail = acct.email +"1111"
+            val personEmail = acct.email //+"1111"
             val personId = acct.id
             val personPhoto = acct.photoUrl
 
@@ -158,6 +161,7 @@ class MainActivity : AppCompatActivity() {
             signOut()
         }
         updateNavHeader()
+        //Toast.makeText(this, bundle?.getInt("currentDestination").toString(),Toast.LENGTH_SHORT).show()
 
         if(currentDestination!=0) {
 
@@ -209,8 +213,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 navController.navigate(currentDestination)
             }
+            //Toast.makeText(this,"tyty",Toast.LENGTH_SHORT).show()
+            nav_view.setNavigationItemSelectedListener { menuItem ->
 
-            navView.setNavigationItemSelectedListener { menuItem ->
+
                 when (menuItem.itemId) {
 
                     R.id.nav_board -> {
@@ -218,6 +224,7 @@ class MainActivity : AppCompatActivity() {
                         navController.navigate(R.id.nav_board)
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = false
+//                        Toast.makeText(this,mainMenu?.getItem(0)?.isVisible.toString(),Toast.LENGTH_SHORT).show()
                         previousDestination = currentDestination
                         currentDestination = R.id.nav_board
                     }
@@ -227,6 +234,7 @@ class MainActivity : AppCompatActivity() {
                         navController.navigate(R.id.nav_bible)
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = true
+//                      Toast.makeText(this,mainMenu?.getItem(0)?.isVisible.toString(),Toast.LENGTH_SHORT).show()
                         previousDestination = currentDestination
                         currentDestination = R.id.nav_bible
                     }
@@ -236,6 +244,7 @@ class MainActivity : AppCompatActivity() {
                         navController.navigate(R.id.nav_classes)
                         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.END)
                         mainMenu?.getItem(0)?.isVisible = false
+//                        Toast.makeText(this,mainMenu?.getItem(0)?.isVisible.toString(),Toast.LENGTH_SHORT).show()
                         previousDestination = currentDestination
                         currentDestination = R.id.nav_classes
                     }

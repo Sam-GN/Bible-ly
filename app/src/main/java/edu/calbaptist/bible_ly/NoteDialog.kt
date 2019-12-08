@@ -21,11 +21,14 @@ import edu.calbaptist.Comment_ly.adapter.CommentMutableListAdapter
 import edu.calbaptist.bible_ly.ui.bible.BibleViewModel
 import android.app.Activity
 import android.content.res.Configuration
+import android.content.res.Resources
+import android.util.DisplayMetrics
 import android.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.text.FieldPosition
 import android.widget.LinearLayout
+import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import edu.calbaptist.bible_ly.ui.bible.selectedNote
@@ -83,21 +86,27 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
             when (item!!.itemId) {
 
                 R.id.note_comment_more_edit-> {
+                    var ll = LinearLayout(context)
+
                     var et = EditText(context)
+                    var param = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
+                    param.setMargins(10.toDp(Resources.getSystem().displayMetrics),0,10.toDp(Resources.getSystem().displayMetrics),0)
+                    et.layoutParams =param
+                    ll.addView(et)
                     et.setText(cmnt.text)
                     var dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
-                        .setTitle("Edit Comment")
-                        .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.comment_dialog_title))
+                        .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                             //Action goes here
                         })
-                        .setPositiveButton("Submit", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.save), DialogInterface.OnClickListener { dialog, which ->
                             if(et.text.toString()!="")
                                 FirestoreRepository().editComment(cmnt.path,et.text.toString())
 
                         })
                         .create()
-                    dialoge.setView(et)
+                    dialoge.setView(ll)
 
                     dialoge.show()
 
@@ -108,11 +117,11 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                 R.id.note_comment_more_delete-> {
                     var dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
-                        .setTitle("Are you sure you want to delete this Comment?")
-                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.comment_delete_title))
+                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
                             //Action goes here
                         })
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                             FirestoreRepository().deleteComment(cmnt.path)
 
                         })
@@ -183,7 +192,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
     @SuppressLint("SetTextI18n")
     private fun updateui(){
 
-        myView.tv_note_frag_verse_num.text = "$bookTitle: Chapter $verseChapter - $verseNum"
+        myView.tv_note_frag_verse_num.text = "$bookTitle:"+getString(R.string.chapter) +"$verseChapter - $verseNum"
         myView.tv_note_frag_verse_text.text = verseText
         myView.tv_note_frag_date.text = note.date!!.toLocalDateString(false)
 
@@ -243,7 +252,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                            /* if(cmnt.user!!.email == MainActivity.user.email)
                                 map[cmnt.user!!.email] = "Me"
                             else*/
-                                map[cmnt.user!!.email] = "User ${++i}"
+                                map[cmnt.user!!.email] = getString(R.string.user)+" ${++i}"
 
                         }
                         list2.add(0,CommentCardViewItem(cmnt.path,map[cmnt.user!!.email]!!,cmnt.user!!,cmnt.text,cmnt.date))
@@ -290,7 +299,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                 if (note!!.user!!.email != MainActivity.user.email)
                     sendNotification(
                         "SendToUser_" + note!!.user!!.email.replace("@", "_"),
-                        "New Comment",
+                        getString(R.string.comment_new),
                         prevComment,
                         requireContext(),
                         note.noteID
@@ -302,7 +311,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
                         if (email != MainActivity.user.email && note!!.user!!.email != email)
                             sendNotification(
                                 "SendToUser_" + email.replace("@", "_"),
-                                "New Comment",
+                                getString(R.string.comment_new),
                                 prevComment,
                                 requireContext(),
                                 note.noteID
@@ -330,13 +339,13 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
 
         var dialogeBuilder = AlertDialog.Builder(requireContext(),R.style.full_screen_dialog)
            // .setTitle("New Event")
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                 targetFragment?.let { fragment ->
                     (fragment as Callback).onDismissed(false)
 
                 }
             })
-            .setPositiveButton("Save",DialogInterface.OnClickListener { dialog, which ->
+            .setPositiveButton(getString(R.string.save),DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
             })
            .setCancelable(false)
@@ -350,7 +359,7 @@ class NoteDialog: DialogFragment(), CommentMutableListAdapter.OnCommentItemMoreS
         dialoge.show()
         (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if (view.et_note_frag_note.text.toString().isEmpty()) {
-                Toast.makeText(requireContext(), "Note is required.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.note_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

@@ -49,7 +49,7 @@ class SignInActivity : AppCompatActivity() {
                     throw ApiException(error("data is null"))
                 }
             } catch (e: ApiException) {
-                Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getText(R.string.sign_in_fail), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -58,7 +58,6 @@ class SignInActivity : AppCompatActivity() {
      * Avoid signing in if the user is already signed in
      */
     override fun onStart() {
-        Log.d(TAG, "onStart")
         super.onStart()
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
@@ -93,7 +92,7 @@ class SignInActivity : AppCompatActivity() {
 
                 startActivity(MainActivity.getLaunchIntent(this))
             } else {
-                Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.sign_in_fail), Toast.LENGTH_LONG).show()
             }
         }
     }

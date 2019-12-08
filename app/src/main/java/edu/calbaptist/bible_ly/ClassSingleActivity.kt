@@ -70,14 +70,14 @@ class ClassSingleActivity : AppCompatActivity()
 
                     var dialoge = AlertDialog.Builder(view.context)
                         .setCancelable(false)
-                        .setTitle("Are you sure you want to remove the student?")
-                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.remove_student))
+                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
                             //Action goes here
                         })
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                             val biblelyStudent = snapshot.toObject(User::class.java)
                             FirestoreRepository().removeStudentFromClass(classID,biblelyStudent!!.email)
-                            Toast.makeText(view.context, "Student Removed", Toast.LENGTH_SHORT)
+                            Toast.makeText(view.context, getString(R.string.student_removed), Toast.LENGTH_SHORT)
                                 .show()
 
                         })
@@ -90,18 +90,17 @@ class ClassSingleActivity : AppCompatActivity()
 
                    var tv = TextView(this)
                     tv.setPadding(10.toDp(Resources.getSystem().displayMetrics),10.toDp(Resources.getSystem().displayMetrics),0,0)
-                    tv.text = "Are you sure you want to promote this student to teacher?\n" +
-                            "You will be removed from the class"
+                    tv.text = getString(R.string.promote_student)
                     var dialoge = AlertDialog.Builder(view.context)
                         .setCancelable(false)
-                        .setTitle("Caution")
-                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.caution))
+                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
 
                         })
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                             val biblelyStudent = snapshot.toObject(User::class.java)
                             FirestoreRepository().promoteStudentAsTeacher(classID,biblelyStudent!!)
-                            Toast.makeText(view.context, "Student Promoted", Toast.LENGTH_SHORT)
+                            Toast.makeText(view.context, getString(R.string.student_promoted), Toast.LENGTH_SHORT)
                                 .show()
                            returnToMainActivity()
                         })
@@ -162,9 +161,9 @@ class ClassSingleActivity : AppCompatActivity()
                     if (t.user!!.email == MainActivity.user.email && t.expireDate!!.after(a.toDate())) {
                         shareIntent(
                             this,
-                            "Join Bible-ly with Token: " + t.id,
-                            "Join Bible-ly BiblelyClass",
-                            "Invite with token: " + t.id
+                            getString(R.string.share_text)+" " + t.id,
+                            getString(R.string.share_subject),
+                            getString(R.string.share_title) +" "+ t.id
                         )
                         return@getServerTimeStamp
                     }
@@ -178,9 +177,9 @@ class ClassSingleActivity : AppCompatActivity()
                 FirestoreRepository().updateClassToken(classID, t)
                 shareIntent(
                     this,
-                    "Join Bible-ly with Token: " + t.id,
-                    "Join Bible-ly BiblelyClass",
-                    "Invite with token: " + t.id
+                    getString(R.string.share_text)+" " + t.id,
+                    getString(R.string.share_subject),
+                    getString(R.string.share_title) +" "+ t.id
                 )
 
             }
@@ -291,7 +290,7 @@ class ClassSingleActivity : AppCompatActivity()
                 }
 
                 override fun onError(e: FirebaseFirestoreException) {
-                    Log.e("ClassFragment", e.message)
+
                 }
             }
             eventRecycleView.adapter = eventAdapter
@@ -340,19 +339,19 @@ class ClassSingleActivity : AppCompatActivity()
 
                 var dialoge = AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setTitle("Are you sure you want to delete this class?")
-                    .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                    .setTitle(getString(R.string.delete_class))
+                    .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
                         //Action goes here
                     })
-                    .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                    .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                         FirestoreRepository().deleteClass(classs!!.classID) {
                             if (it) {
-                                Toast.makeText(this, "Class deleted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.class_deleted), Toast.LENGTH_SHORT).show()
                                 returnToMainActivity()
                             } else
                                 Toast.makeText(
                                     this,
-                                    "You can only delete empty classes",
+                                    getString(R.string.class_delete_failed),
                                     Toast.LENGTH_SHORT
                                 ).show()
                         }
@@ -364,11 +363,11 @@ class ClassSingleActivity : AppCompatActivity()
 
                 var dialoge = AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setTitle("Are you sure you want to leave?")
-                    .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                    .setTitle(getString(R.string.leave_class))
+                    .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
 
                     })
-                    .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                    .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                         FirestoreRepository().leaveClass(classID)
                         returnToMainActivity()
                     })

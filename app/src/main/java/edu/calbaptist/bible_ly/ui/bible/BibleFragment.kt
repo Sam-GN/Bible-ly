@@ -88,10 +88,10 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
                 R.id.bible_verse_share ->{
                     Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT,"$book: chapter:$verseChapter-verse: $verseNum\n" +
+                        putExtra(Intent.EXTRA_TEXT,"${books[bookNum].name}: ${getString(R.string.chapter)}:$verseChapter-${getString(R.string.verse)}: $verseNum\n" +
                                 "$verseText")
                         putExtra(Intent.EXTRA_SUBJECT, "")
-                    }.also { intent -> val chooserIntent = Intent.createChooser(intent,"Share Verse")
+                    }.also { intent -> val chooserIntent = Intent.createChooser(intent,getString(R.string.share_verse))
                         startActivity(chooserIntent)
                     }
                 }
@@ -131,11 +131,11 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
                 R.id.bible_note_delete_note-> {
                     var dialoge = AlertDialog.Builder(requireContext())
                         .setCancelable(false)
-                        .setTitle("Are you sure you want to delete this note?")
-                        .setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                        .setTitle(getString(R.string.delete_note_title))
+                        .setNegativeButton(getString(R.string.no), DialogInterface.OnClickListener { dialog, which ->
                             //Action goes here
                         })
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, which ->
+                        .setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
                             FirestoreRepository().deleteNote(note.noteID)
 
                         })
@@ -365,7 +365,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
         var dialoge = AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setTitle("Select chapter")
+            .setTitle(getString(R.string.select_chapter))
             .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
             })
@@ -373,7 +373,7 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
         var listItems = mutableListOf<String>() // bibleViewModel.verses.value!! //.distinctBy { it.chapter }
         for (i in 1..books[bookNum-1].chapterCount)
-            listItems.add("Chapter "+ i)
+            listItems.add(getString(R.string.chapter)+" "+ i)
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItems)
         var list = ListView(requireContext())
@@ -392,8 +392,8 @@ class BibleFragment : Fragment(), BibleMutableListAdapter.OnBibleItemSelectedLis
 
         var dialoge = AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setTitle("Select Book")
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+            .setTitle(getString(R.string.select_book))
+            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
             })
             .create()

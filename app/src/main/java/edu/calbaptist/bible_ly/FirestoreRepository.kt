@@ -128,7 +128,7 @@ class FirestoreRepository {
                                 if (t.id == id) {
 
                                     if(c!!.teacher!!.email == MainActivity.user.email){
-                                        Toast.makeText(context,"You can't join a class you teach",Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context,context.getString(R.string.class_join_failed),Toast.LENGTH_LONG).show()
                                         return@getServerTimeStamp
                                     }
 
@@ -150,7 +150,7 @@ class FirestoreRepository {
                                                     )
                                                 }
                                                 else{
-                                                    Toast.makeText(context,"You are already in this class",Toast.LENGTH_LONG).show()
+                                                    Toast.makeText(context,context.getString(R.string.already_in_class),Toast.LENGTH_LONG).show()
 //                                                            firestoreDB
 //                                                                .document(clss.reference.path)
 //                                                                .collection("students").document().set(MainActivity.user)
@@ -163,7 +163,7 @@ class FirestoreRepository {
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "Token Expired.",
+                                            context.getString(R.string.token_expired),
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }
@@ -176,7 +176,7 @@ class FirestoreRepository {
                         }
                         Toast.makeText(
                             context,
-                            "Invalid Token.",
+                            context.getString(R.string.token_invalid),
                             Toast.LENGTH_LONG
                         ).show()
 

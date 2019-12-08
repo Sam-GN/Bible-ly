@@ -198,7 +198,7 @@ class ClassesFragment : Fragment(), ClassMutableListAdapter.OnBiblelyClassItemSe
 
           var dialoge = AlertDialog.Builder(requireActivity())
                 .setCancelable(false)
-                .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+                .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                     //Action goes here
                 })
                 .setView(view).create()

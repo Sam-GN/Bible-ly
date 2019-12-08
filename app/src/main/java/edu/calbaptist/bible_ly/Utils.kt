@@ -80,7 +80,6 @@ fun ImageButton.setGlide(imagePath: String){
                 .into(this)
 
         }catch (e: IOException){
-            Log.e("BoardAdapter",e.message)
             this.setImageResource(R.mipmap.ic_launcher2_round)
         }
 
@@ -108,7 +107,6 @@ fun ImageView.setGlide(imagePath: String,isRound:Boolean){
 
 
         }catch (e: IOException){
-            Log.e("BoardAdapter",e.message)
             this.setImageResource(R.mipmap.ic_launcher2_round)
         }
 
@@ -313,15 +311,15 @@ fun sendNotification(topic:String,title:String,message:String,context: Context,p
         notification.put("to", TOPIC)
         notification.put("data", notifcationBody)
     } catch (e: JSONException) {
-        Log.e(TAG, "onCreate: " + e.message )
+       // Log.e(TAG, "onCreate: " + e.message )
     }
     var jsonObjectRequest  = object: JsonObjectRequest(
         Method.POST, FCM_API, notification,
         Response.Listener<JSONObject> { response ->
-            Log.i(TAG, "onResponse: $response")
+           // Log.i(TAG, "onResponse: $response")
         },
         Response.ErrorListener {
-            Toast.makeText(context, "That didn't work!", Toast.LENGTH_SHORT).show()
+          //  Toast.makeText(context, "That didn't work!", Toast.LENGTH_SHORT).show()
         })
     {
         override fun getHeaders(): MutableMap<String, String> {
@@ -338,7 +336,7 @@ fun sendNotification(topic:String,title:String,message:String,context: Context,p
 fun getCurrentActivity(context:Context) :String{
     var am =  context.getSystemService(ACTIVITY_SERVICE) as (ActivityManager)
     var  taskInfo = am.getRunningTasks(1);
-    Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.className)
+  //  Log.d("topActivity", "CURRENT Activity ::" + taskInfo.get(0).topActivity.className)
     var componentInfo = taskInfo[0].topActivity
     return  componentInfo.className
 }

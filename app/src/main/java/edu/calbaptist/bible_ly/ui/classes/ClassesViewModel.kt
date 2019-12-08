@@ -22,7 +22,6 @@ class ClassesViewModel : ViewModel() {
         firebaseRepository.getClassesAsStudentQuery()
             .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
                 if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
                     classesAsStudent.value = null
                     return@EventListener
                 }
@@ -44,7 +43,6 @@ class ClassesViewModel : ViewModel() {
         firebaseRepository.getClassesAsTeacherQuery()
             .addSnapshotListener(EventListener<QuerySnapshot> { value, e ->
                 if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
                     classesAsTeacher.value = null
                     return@EventListener
                 }

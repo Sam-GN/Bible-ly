@@ -159,10 +159,10 @@ class ClassDialog: DialogFragment(){
         var dialogeBuilder =AlertDialog.Builder(requireActivity())
             .setCancelable(false)
             .setIcon(android.R.drawable.ic_dialog_alert)
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
 
             })
-            .setPositiveButton(if(isNew!!){"Create"}else{"Save"}, DialogInterface.OnClickListener { dialog, which ->
+            .setPositiveButton(if(isNew!!){getString(R.string.create)}else{getString(R.string.save)}, DialogInterface.OnClickListener { dialog, which ->
 
                 if(isNew!!) {
                     FirestoreRepository().saveClass(
@@ -211,7 +211,7 @@ class ClassDialog: DialogFragment(){
                     openAlbum()
                 }
                 else {
-                    Toast.makeText(requireContext(), "You denied the permission", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
                 }
         }
     }
@@ -286,7 +286,7 @@ class ClassDialog: DialogFragment(){
 
         }
         else {
-            Toast.makeText(requireContext(), "Failed to get image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.failed_get_image, Toast.LENGTH_SHORT).show()
         }
     }
 

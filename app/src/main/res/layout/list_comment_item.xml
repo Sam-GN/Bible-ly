@@ -29,7 +29,7 @@
             android:id="@+id/tv_note_comment_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User"
+            android:text="@string/user"
             android:paddingEnd="8dp"
             />
         <TextView
@@ -37,7 +37,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="6"
-            android:text="Date" />
+            android:text="@string/date" />
         <ImageView
             android:id="@+id/iv_note_comment_more"
             android:layout_width="25dp"

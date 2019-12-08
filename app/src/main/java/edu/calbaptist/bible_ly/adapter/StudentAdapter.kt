@@ -82,7 +82,6 @@ open class StudentAdapter (query: Query, private val listener: OnStudentItemSele
                         .into(ivLogo)
 
                 }catch (e: IOException){
-                    Log.e("BoardAdapter",e.message)
                     ivLogo.setImageResource(R.mipmap.ic_launcher2_round)
                 }
 

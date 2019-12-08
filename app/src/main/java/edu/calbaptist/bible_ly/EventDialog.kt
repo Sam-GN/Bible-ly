@@ -69,12 +69,12 @@ class EventDialog: DialogFragment() {
             var datePicker = DatePicker(requireContext())
 
             var dialoge2 = AlertDialog.Builder(requireContext())
-                .setTitle("Pick Date")
+                .setTitle(getString(R.string.pick_date))
                 .setCancelable(false)
-                .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+                .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                     //Action goes here
                 })
-                .setPositiveButton("Select", DialogInterface.OnClickListener { dialog, which ->
+                .setPositiveButton(getString(R.string.select), DialogInterface.OnClickListener { dialog, which ->
                     //view.btn_event_frag_date.tag = datePicker.getCalendarFromDatePicker()
                     getTime(view.btn_event_frag_date,requireContext(),datePicker.getCalendarFromDatePicker())
 
@@ -87,25 +87,25 @@ class EventDialog: DialogFragment() {
         var dialogeBuilder = AlertDialog.Builder(requireContext())
            // .setTitle("New Event")
 
-            .setNegativeButton("Close", DialogInterface.OnClickListener { dialog, which ->
+            .setNegativeButton(getString(R.string.close), DialogInterface.OnClickListener { dialog, which ->
                 //Action goes here
             })
            .setCancelable(false)
             .setView(view)//.create()
 
         if(isTeacher!!)
-            dialogeBuilder.setPositiveButton(if(isNew!!) "Create" else "Update", DialogInterface.OnClickListener { dialog, which ->
+            dialogeBuilder.setPositiveButton(if(isNew!!) getString(R.string.create) else getString(R.string.save), DialogInterface.OnClickListener { dialog, which ->
 
             })
         var dialoge = dialogeBuilder.create()
         dialoge.show()
         (dialoge as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if(view.et_event_frag_title.text.toString().isEmpty()){
-                Toast.makeText(requireContext(),"Title is required.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),getString(R.string.title_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if(view.btn_event_frag_date.tag==null){
-                Toast.makeText(requireContext(),"Date is required.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),getString(R.string.date_required), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

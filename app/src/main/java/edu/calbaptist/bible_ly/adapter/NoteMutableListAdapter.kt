@@ -1,5 +1,6 @@
 package edu.calbaptist.Note_ly.adapter
 
+import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -71,7 +72,7 @@ open class NoteMutableListAdapter (private val listener: OnNoteItemSelectedListe
         ) {
 
             if(itemViewType==0){
-                itemView.tv_bible_note_verse_num.text = note.verseNum
+                itemView.tv_bible_note_verse_num.text =itemView.context.getString(R.string.note_verse_num, note.verseNum)
                 itemView.tv_bible_note_text.text = note.noteText
                 itemView.tv_bible_note_title.text = note.noteTitle
                 itemView.tv_bible_note_date.text = note.date!!.toLocalDateString(false)
@@ -102,19 +103,20 @@ open class NoteMutableListAdapter (private val listener: OnNoteItemSelectedListe
                 itemView.iv_bible_note_type.setOnClickListener {
                     if(note.shared) {
                         if(note.user!!.email==MainActivity.user.email){
-                            Toast.makeText(itemView.context,"You have shared this note",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(itemView.context,R.string.you_shared_note,Toast.LENGTH_SHORT).show()
                         } else {
-                            Toast.makeText(itemView.context,"This Note is shared with your class",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(itemView.context,R.string.others_shared_note,Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
                 itemView.iv_bible_note_hasComment.setOnClickListener {
-                    Toast.makeText(itemView.context,"This note has comments",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(itemView.context,R.string.note_has_comment,Toast.LENGTH_SHORT).show()
                 }
 
             }
+
             if(itemViewType==1) {
-                itemView.tv_bible_note_chapter_num.text =  "Chapter: ${note.verseChapter}"
+                itemView.tv_bible_note_chapter_num.text =itemView.context.getString(R.string.note_chapter_num,note.verseChapter)
 
             }
 
