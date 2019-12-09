@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
@@ -264,8 +265,10 @@ class MainActivity : AppCompatActivity() {
                             R.id.nav_classes
                     }
 
-                    R.id.nav_share -> { /*Toast.makeText(this,"For sharing Links",Toast.LENGTH_SHORT).show()*/
-                       // navController.navigate(R.id.nav_bible,bundle)
+                    R.id.nav_share -> {
+
+                     Toast.makeText(this,"For sharing Links",Toast.LENGTH_SHORT).show()
+
                     }
 
                 }

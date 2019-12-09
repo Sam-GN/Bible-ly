@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/colorAccent"
             fab:fab_colorPressed="@color/colorAccentLight"
-            fab:fab_icon="@drawable/ic_pen"
+            fab:fab_icon="@drawable/ic_create_black_24dp"
             fab:fab_title="Create Classroom" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
